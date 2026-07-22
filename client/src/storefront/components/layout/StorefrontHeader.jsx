@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Heart, Menu, Moon, Search, ShoppingBag, Sun, X } from 'lucide-react'
+import { Heart, Menu, Moon, Search, ShoppingBag, Sun, User, X } from 'lucide-react'
 import { storefrontNav } from '@/storefront/data/home'
 import { Button } from '@/shared/components/ui/Button'
 import { useTheme } from '@/shared/hooks/useTheme'
@@ -55,25 +54,25 @@ export function StorefrontHeader() {
           <Button variant="ghost" size="icon" aria-label="Search" className="text-hm-text">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Wishlist" className="text-hm-text">
-            <Heart className="h-4 w-4" />
-          </Button>
+          <Link to="/account">
+            <Button variant="ghost" size="icon" aria-label="Account" className="text-hm-text">
+              <User className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link to="/wishlist">
+            <Button variant="ghost" size="icon" aria-label="Wishlist" className="text-hm-text">
+              <Heart className="h-4 w-4" />
+            </Button>
+          </Link>
           <Link to="/cart" className="relative">
             <Button variant="ghost" size="icon" aria-label="Cart" className="text-hm-text">
               <ShoppingBag className="h-4 w-4" />
             </Button>
-            <AnimatePresence>
-              {count > 0 ? (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-hm-accent px-1 text-[10px] font-bold text-hm-primary"
-                >
-                  {count}
-                </motion.span>
-              ) : null}
-            </AnimatePresence>
+            {count > 0 ? (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-hm-accent px-1 text-[10px] font-bold text-hm-primary">
+                {count}
+              </span>
+            ) : null}
           </Link>
           <Button
             variant="ghost"
@@ -87,62 +86,54 @@ export function StorefrontHeader() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open ? (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Close menu"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-hm-overlay md:hidden"
-              onClick={() => setOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-              className="fixed inset-y-0 left-0 z-50 w-[280px] border-r border-hm-border bg-hm-elevated p-6 md:hidden"
-            >
-              <div className="mb-8 flex items-center justify-between">
-                <p className="font-display text-2xl text-hm-text">HandMade</p>
-                <button
-                  type="button"
-                  aria-label="Close"
-                  onClick={() => setOpen(false)}
-                  className="rounded-full p-2 text-hm-text-muted hover:bg-hm-muted"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <nav className="flex flex-col gap-4">
-                {storefrontNav.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setOpen(false)}
-                    className="text-lg text-hm-text"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                <Link to="/cart" onClick={() => setOpen(false)} className="text-lg text-hm-text">
-                  Bag ({count})
-                </Link>
+      {open ? (
+        <>
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="fixed inset-0 z-40 bg-hm-overlay md:hidden"
+            onClick={() => setOpen(false)}
+          />
+          <aside className="fixed inset-y-0 left-0 z-50 w-[280px] border-r border-hm-border bg-hm-elevated p-6 md:hidden">
+            <div className="mb-8 flex items-center justify-between">
+              <p className="font-display text-2xl text-hm-text">HandMade</p>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setOpen(false)}
+                className="rounded-full p-2 text-hm-text-muted hover:bg-hm-muted"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <nav className="flex flex-col gap-4">
+              {storefrontNav.map((item) => (
                 <Link
-                  to="/admin"
+                  key={item.path}
+                  to={item.path}
                   onClick={() => setOpen(false)}
-                  className="mt-4 text-sm text-hm-accent"
+                  className="text-lg text-hm-text"
                 >
-                  Admin ERP
+                  {item.label}
                 </Link>
-              </nav>
-            </motion.aside>
-          </>
-        ) : null}
-      </AnimatePresence>
+              ))}
+              <Link to="/cart" onClick={() => setOpen(false)} className="text-lg text-hm-text">
+                Bag ({count})
+              </Link>
+              <Link to="/login" onClick={() => setOpen(false)} className="text-lg text-hm-text">
+                Sign in
+              </Link>
+              <Link
+                to="/admin"
+                onClick={() => setOpen(false)}
+                className="mt-4 text-sm text-hm-accent"
+              >
+                Admin ERP
+              </Link>
+            </nav>
+          </aside>
+        </>
+      ) : null}
     </header>
   )
 }

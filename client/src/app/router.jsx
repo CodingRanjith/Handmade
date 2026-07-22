@@ -2,12 +2,12 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AdminLayout } from '@/admin/components/layout'
 import { AdminDashboardPage } from '@/admin/pages/DashboardPage'
 import { AdminPlaceholderPage } from '@/admin/pages/PlaceholderPage'
-import { ProductsPage } from '@/admin/features/products/ProductsPage'
+import { ProductsPage as AdminProductsPage } from '@/admin/features/products/ProductsPage'
 import {
   ProductCreatePage,
   ProductEditPage,
 } from '@/admin/features/products/ProductFormPages'
-import { CategoriesPage } from '@/admin/features/categories/CategoriesPage'
+import { CategoriesPage as AdminCategoriesPage } from '@/admin/features/categories/CategoriesPage'
 import { SubcategoriesPage } from '@/admin/features/subcategories/SubcategoriesPage'
 import { BrandsPage } from '@/admin/features/brands/BrandsPage'
 import { InventoryPage } from '@/admin/features/inventory/InventoryPage'
@@ -30,6 +30,37 @@ import { AuditLogsPage } from '@/admin/features/audit/AuditLogsPage'
 import { DesignSystemPage } from '@/storefront/pages/DesignSystemPage'
 import { HomePage } from '@/storefront/pages/HomePage'
 import { CartPage } from '@/storefront/pages/CartPage'
+import { ProductsPage } from '@/storefront/pages/ProductsPage'
+import { ProductDetailsPage } from '@/storefront/pages/ProductDetailsPage'
+import {
+  CategoriesPage,
+  PersonalizedGiftsPage,
+  BulkOrdersPage,
+} from '@/storefront/pages/ShopPages'
+import { CorporateGiftsPage } from '@/storefront/pages/CorporateGiftsPage'
+import {
+  AboutPage,
+  BlogPage,
+  BlogPostPage,
+  FaqPage,
+  ContactPage,
+} from '@/storefront/pages/ContentPages'
+import {
+  LoginPage,
+  SignupPage,
+  ForgotPasswordPage,
+  WishlistPage,
+  CheckoutPage,
+  OrderSuccessPage,
+} from '@/storefront/pages/AuthCheckoutPages'
+import {
+  AccountLayout,
+  AccountOverviewPage,
+  AccountOrdersPage,
+  AccountProfilePage,
+  AccountAddressesPage,
+  AccountNotificationsPage,
+} from '@/storefront/pages/AccountPages'
 import { StorefrontLayout } from '@/storefront/layouts/StorefrontLayout'
 import { adminFlatNav } from '@/admin/config/navigation'
 
@@ -58,18 +89,6 @@ const implementedAdminPaths = new Set([
   '/admin/audit-logs',
 ])
 
-function StorefrontPlaceholder({ title }) {
-  return (
-    <div className="mx-auto flex min-h-[60svh] max-w-3xl flex-col items-center justify-center px-6 py-32 text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-hm-accent">Coming soon</p>
-      <h1 className="mt-3 font-display text-4xl text-hm-text sm:text-5xl">{title}</h1>
-      <p className="mt-3 text-sm text-hm-text-muted">
-        This page will be built in a later storefront module.
-      </p>
-    </div>
-  )
-}
-
 export function AppRouter() {
   const adminModuleRoutes = adminFlatNav.filter(
     (item) => !implementedAdminPaths.has(item.path),
@@ -79,27 +98,41 @@ export function AppRouter() {
     <Routes>
       <Route element={<StorefrontLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="products/:id" element={<ProductDetailsPage />} />
+        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="personalized-gifts" element={<PersonalizedGiftsPage />} />
+        <Route path="corporate-gifts" element={<CorporateGiftsPage />} />
+        <Route path="bulk-orders" element={<BulkOrdersPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="blog" element={<BlogPage />} />
+        <Route path="blog/:id" element={<BlogPostPage />} />
+        <Route path="faq" element={<FaqPage />} />
+        <Route path="contact" element={<ContactPage />} />
         <Route path="cart" element={<CartPage />} />
-        <Route path="checkout" element={<StorefrontPlaceholder title="Checkout" />} />
-        <Route path="products" element={<StorefrontPlaceholder title="Products" />} />
-        <Route path="products/:id" element={<StorefrontPlaceholder title="Product details" />} />
-        <Route path="categories" element={<StorefrontPlaceholder title="Categories" />} />
-        <Route path="personalized-gifts" element={<StorefrontPlaceholder title="Personalized Gifts" />} />
-        <Route path="corporate-gifts" element={<StorefrontPlaceholder title="Corporate Gifts" />} />
-        <Route path="about" element={<StorefrontPlaceholder title="About" />} />
-        <Route path="blog" element={<StorefrontPlaceholder title="Blog" />} />
-        <Route path="contact" element={<StorefrontPlaceholder title="Contact" />} />
-        <Route path="faq" element={<StorefrontPlaceholder title="FAQ" />} />
+        <Route path="checkout" element={<CheckoutPage />} />
+        <Route path="order-success" element={<OrderSuccessPage />} />
+        <Route path="wishlist" element={<WishlistPage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="signup" element={<SignupPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="account" element={<AccountLayout />}>
+          <Route index element={<AccountOverviewPage />} />
+          <Route path="orders" element={<AccountOrdersPage />} />
+          <Route path="profile" element={<AccountProfilePage />} />
+          <Route path="addresses" element={<AccountAddressesPage />} />
+          <Route path="notifications" element={<AccountNotificationsPage />} />
+        </Route>
       </Route>
 
       <Route path="/design-system" element={<DesignSystemPage />} />
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboardPage />} />
-        <Route path="products" element={<ProductsPage />} />
+        <Route path="products" element={<AdminProductsPage />} />
         <Route path="products/new" element={<ProductCreatePage />} />
         <Route path="products/:id/edit" element={<ProductEditPage />} />
-        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="categories" element={<AdminCategoriesPage />} />
         <Route path="subcategories" element={<SubcategoriesPage />} />
         <Route path="brands" element={<BrandsPage />} />
         <Route path="inventory" element={<InventoryPage />} />
