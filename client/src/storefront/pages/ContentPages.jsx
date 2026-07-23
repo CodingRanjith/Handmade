@@ -49,31 +49,6 @@ const faqs = [
   },
 ]
 
-export function AboutPage() {
-  return (
-    <div>
-      <PageHero
-        eyebrow="About"
-        title="Crafted with intention"
-        description="HandMade is an atelier for thoughtful gifting — personal, corporate, and home."
-      />
-      <div className="mx-auto max-w-3xl space-y-6 px-5 py-12 text-sm leading-relaxed text-hm-text-muted sm:px-8 sm:text-base">
-        <p>
-          We design and curate objects that feel quiet, useful, and beautiful. From walnut trays to
-          welcome hampers, every piece is chosen for presence — not noise.
-        </p>
-        <p>
-          Whether you’re gifting one person or five hundred, our studio helps you personalize,
-          pack, and deliver with care.
-        </p>
-        <Link to="/categories">
-          <Button variant="primary">Explore gifts</Button>
-        </Link>
-      </div>
-    </div>
-  )
-}
-
 export function BlogPage() {
   return (
     <div>

@@ -1,10 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="HandMade — premium curated gifts, crafted with intention." />
+    <meta name="color-scheme" content="light" />
+    <script>
+      // Force light on first paint unless user previously chose a theme
+      (function () {
+        try {
+          var t = localStorage.getItem('hm_theme_v2')
+          if (t !== 'light' && t !== 'dark') {
+            localStorage.setItem('hm_theme_v2', 'light')
+            t = 'light'
+          }
+          if (t === 'dark') document.documentElement.classList.add('dark')
+          else document.documentElement.classList.remove('dark')
+          document.documentElement.dataset.theme = t || 'light'
+        } catch (e) {
+          document.documentElement.classList.remove('dark')
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

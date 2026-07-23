@@ -1,39 +1,42 @@
 import { Link } from 'react-router-dom'
-import { primaryNav } from '@/storefront/config/sitemap'
+import { SocialLinks } from '@/storefront/components/layout/SocialLinks'
 
 const footerColumns = [
   {
-    title: 'Shop',
+    title: 'Policy Info',
     links: [
-      ...primaryNav,
-      { label: 'Gift Ideas', path: '/gift-ideas' },
+      { label: 'Terms & Conditions', path: '/terms' },
+      { label: 'Privacy Policy', path: '/privacy' },
+      { label: 'Terms of Use', path: '/terms-of-use' },
+      { label: 'Disclaimer', path: '/disclaimer' },
     ],
   },
   {
-    title: 'Surprise',
+    title: 'About Company',
     links: [
-      { label: 'Local Surprise', path: '/surprise/local' },
-      { label: 'Digital Surprise', path: '/surprise/digital' },
-      { label: 'AI Gift Finder', path: '/ai/quiz' },
-      { label: 'Gift Registry', path: '/registry' },
+      { label: 'About Us', path: '/about' },
+      { label: 'HandMade Team', path: '/about#team' },
+      { label: 'Careers', path: '/careers' },
+      { label: 'Testimonials', path: '/testimonials' },
+      { label: 'News Room', path: '/news' },
+      { label: 'Blog', path: '/blog' },
     ],
   },
   {
-    title: 'Help',
+    title: 'HandMade Business',
     links: [
-      { label: 'FAQ', path: '/faq' },
-      { label: 'Contact', path: '/contact' },
-      { label: 'Track order', path: '/track-order' },
-      { label: 'Refer & Earn', path: '/refer' },
+      { label: 'Decorator Services', path: '/surprise/local' },
+      { label: 'Corporate Service', path: '/corporate' },
+      { label: 'Affiliate Program', path: '/affiliate' },
+      { label: 'Retail Stores', path: '/store' },
+      { label: 'Franchise', path: '/franchise' },
     ],
   },
   {
-    title: 'Account',
+    title: 'Need Help ?',
     links: [
-      { label: 'Login', path: '/login' },
-      { label: 'Sign up', path: '/signup' },
-      { label: 'My account', path: '/account' },
-      { label: 'Wishlist', path: '/wishlist' },
+      { label: 'Contact Us', path: '/contact' },
+      { label: 'FAQs', path: '/faq' },
     ],
   },
 ]
@@ -52,6 +55,12 @@ export function StorefrontFooter() {
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/75">
             India&apos;s premium gifting experience — personalized, corporate, and surprise.
           </p>
+          <div className="mt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
+              Follow us
+            </p>
+            <SocialLinks className="mt-3" variant="dark" />
+          </div>
         </div>
         {footerColumns.map((col) => (
           <div key={col.title}>
@@ -60,7 +69,7 @@ export function StorefrontFooter() {
             </p>
             <ul className="mt-4 space-y-2.5">
               {col.links.map((item) => (
-                <li key={item.path}>
+                <li key={`${item.path}-${item.label}`}>
                   <Link
                     to={item.path}
                     className="inline-flex min-h-9 items-center text-sm text-white/80 hover:text-white"
@@ -73,8 +82,13 @@ export function StorefrontFooter() {
           </div>
         ))}
       </div>
-      <div className="relative border-t border-white/15 px-5 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center text-xs text-white/60 sm:px-8">
-        © {new Date().getFullYear()} HandMade · Crafted for memorable moments
+      <div className="relative border-t border-white/15 px-5 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-center text-xs text-white/60 sm:text-left">
+            © {new Date().getFullYear()} HandMade · Crafted for memorable moments
+          </p>
+          <SocialLinks variant="dark" className="justify-center" />
+        </div>
       </div>
     </footer>
   )

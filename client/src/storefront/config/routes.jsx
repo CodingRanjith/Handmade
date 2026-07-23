@@ -6,12 +6,12 @@ import { ProductDetailsPage } from '@/storefront/pages/ProductDetailsPage'
 import { BulkOrdersPage } from '@/storefront/pages/ShopPages'
 import { PersonalizedPage } from '@/storefront/features/personalized'
 import {
-  AboutPage,
   BlogPage,
   BlogPostPage,
   FaqPage,
   ContactPage,
 } from '@/storefront/pages/ContentPages'
+import { AboutPage } from '@/storefront/pages/AboutPage'
 import {
   LoginPage,
   SignupPage,

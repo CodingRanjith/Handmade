@@ -4,12 +4,14 @@ const seed = [
   {
     id: 'ce_1',
     company: 'NovaTech Pvt Ltd',
-    contact: 'Sneha Iyer',
-    email: 'sneha@novatech.example',
-    phone: '',
+    contact: 'NovaTech Pvt Ltd',
+    email: '',
+    phone: '9876543210',
+    moq: 'High',
+    who: 'HR',
     budget: 150000,
     employees: 120,
-    interest: 'Corporate',
+    interest: 'MOQ: High · Role: HR',
     message: 'Diwali gifting for all employees — prefer sustainable packaging.',
     source: 'admin',
     status: 'new',
@@ -19,12 +21,14 @@ const seed = [
   {
     id: 'ce_2',
     company: 'Cedar Bank',
-    contact: 'Arjun Kapoor',
-    email: 'arjun@cedarbank.example',
-    phone: '',
+    contact: 'Cedar Bank',
+    email: '',
+    phone: '9123456780',
+    moq: 'Medium',
+    who: 'CEO',
     budget: 420000,
     employees: 350,
-    interest: 'Corporate',
+    interest: 'MOQ: Medium · Role: CEO',
     message: 'Client appreciation hampers for Q3.',
     source: 'admin',
     status: 'open',
@@ -34,12 +38,14 @@ const seed = [
   {
     id: 'ce_3',
     company: 'Bloom Studios',
-    contact: 'Meera Das',
-    email: 'meera@bloom.example',
-    phone: '',
+    contact: 'Bloom Studios',
+    email: '',
+    phone: '9988776655',
+    moq: 'Low',
+    who: 'Prospector',
     budget: 85000,
     employees: 40,
-    interest: 'Corporate',
+    interest: 'MOQ: Low · Role: Prospector',
     message: 'Onboarding kits with branded notebooks.',
     source: 'admin',
     status: 'completed',
@@ -48,7 +54,7 @@ const seed = [
   },
 ]
 
-export const corporateEnquiriesStore = createLocalStore('hm_admin_corporate_v1', seed, 'ce')
+export const corporateEnquiriesStore = createLocalStore('hm_admin_corporate_v2', seed, 'ce')
 
 export function listCorporateEnquiries() {
   return corporateEnquiriesStore.list()
@@ -57,9 +63,11 @@ export function listCorporateEnquiries() {
 export function createCorporateEnquiry(payload) {
   return corporateEnquiriesStore.create({
     company: payload.company || 'Website enquiry',
-    contact: payload.contact || '',
+    contact: payload.contact || payload.company || '',
     email: payload.email || '',
     phone: payload.phone || '',
+    moq: payload.moq || '',
+    who: payload.who || '',
     budget: Number(payload.budget) || 0,
     employees: Number(payload.employees) || 0,
     interest: payload.interest || '',

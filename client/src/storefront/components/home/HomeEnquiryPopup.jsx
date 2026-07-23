@@ -7,20 +7,26 @@ import { Input, Select, TextArea } from '@/storefront/components/ui/Input'
 import { cn } from '@/shared/utils/cn'
 
 const SESSION_KEY = 'hm_home_enquiry_seen'
-const INTEREST_OPTIONS = [
-  'Personalized gifts',
-  'Corporate gifts',
-  'Surprise planning',
-  'Custom order',
-  'Other',
+
+const MOQ_OPTIONS = [
+  { value: 'Low', label: 'Low' },
+  { value: 'Medium', label: 'Medium' },
+  { value: 'High', label: 'High' },
+]
+
+const WHO_OPTIONS = [
+  { value: 'HR', label: 'HR' },
+  { value: 'Prospector', label: 'Prospector' },
+  { value: 'CEO', label: 'CEO' },
+  { value: 'Other', label: 'Other' },
 ]
 
 const emptyForm = {
-  contact: '',
-  email: '',
+  name: '',
+  moq: 'Medium',
+  who: 'HR',
   phone: '',
-  interest: INTEREST_OPTIONS[0],
-  message: '',
+  description: '',
 }
 
 /**
@@ -86,18 +92,21 @@ export function HomeEnquiryPopup() {
 
   function validate() {
     const next = {}
-    if (!form.contact.trim() || form.contact.trim().length < 2) {
-      next.contact = 'Please enter your name'
+    if (!form.name.trim() || form.name.trim().length < 2) {
+      next.name = 'Enter company or personal name'
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      next.email = 'Enter a valid email'
+    if (!form.moq) {
+      next.moq = 'Select MOQ'
+    }
+    if (!form.who) {
+      next.who = 'Select your role'
     }
     const phone = form.phone.replace(/\D/g, '')
-    if (phone && phone.length < 10) {
-      next.phone = 'Enter a valid 10-digit phone'
+    if (!phone || phone.length < 10) {
+      next.phone = 'Enter a valid 10-digit mobile number'
     }
-    if (!form.message.trim() || form.message.trim().length < 8) {
-      next.message = 'Tell us a little more (at least 8 characters)'
+    if (!form.description.trim() || form.description.trim().length < 8) {
+      next.description = 'Please add a short description (at least 8 characters)'
     }
     setErrors(next)
     return Object.keys(next).length === 0
@@ -108,13 +117,15 @@ export function HomeEnquiryPopup() {
     if (!validate()) return
     setSubmitting(true)
     try {
+      const name = form.name.trim()
       createCorporateEnquiry({
-        company: 'Home page enquiry',
-        contact: form.contact.trim(),
-        email: form.email.trim(),
+        company: name,
+        contact: name,
         phone: form.phone.trim(),
-        interest: form.interest,
-        message: form.message.trim(),
+        moq: form.moq,
+        who: form.who,
+        interest: `MOQ: ${form.moq} · Role: ${form.who}`,
+        message: form.description.trim(),
         source: 'home',
         status: 'new',
       })
@@ -163,10 +174,10 @@ export function HomeEnquiryPopup() {
                         HandMade
                       </p>
                       <h2 className="mt-1 font-display text-2xl tracking-tight text-hm-text">
-                        Send an enquiry
+                        Enquiry Form
                       </h2>
                       <p className="mt-1 text-sm text-hm-text-muted">
-                        Tell us what you need — we&apos;ll get back within a day.
+                        Share a few details — we&apos;ll get back within a day.
                       </p>
                     </div>
                     <button
@@ -195,61 +206,70 @@ export function HomeEnquiryPopup() {
                     onSubmit={handleSubmit}
                     className="space-y-3.5 overflow-y-auto px-5 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6"
                   >
-                    <Field label="Your name" error={errors.contact}>
+                    <Field label="Company name or personal name" error={errors.name}>
                       <Input
-                        name="contact"
-                        autoComplete="name"
-                        placeholder="Full name"
-                        value={form.contact}
-                        onChange={(e) => updateField('contact', e.target.value)}
-                        className={cn(errors.contact && 'border-hm-danger')}
+                        name="name"
+                        autoComplete="organization"
+                        placeholder="Company / personal name"
+                        value={form.name}
+                        onChange={(e) => updateField('name', e.target.value)}
+                        className={cn(errors.name && 'border-hm-danger')}
                       />
                     </Field>
-                    <Field label="Email" error={errors.email}>
-                      <Input
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="you@example.com"
-                        value={form.email}
-                        onChange={(e) => updateField('email', e.target.value)}
-                        className={cn(errors.email && 'border-hm-danger')}
-                      />
+
+                    <Field label="MOQ (Minimum order quantity)" error={errors.moq}>
+                      <Select
+                        name="moq"
+                        value={form.moq}
+                        onChange={(e) => updateField('moq', e.target.value)}
+                        className={cn(errors.moq && 'border-hm-danger')}
+                      >
+                        {MOQ_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Select>
                     </Field>
-                    <Field label="Phone" error={errors.phone} hint="Optional">
+
+                    <Field label="Who?" error={errors.who}>
+                      <Select
+                        name="who"
+                        value={form.who}
+                        onChange={(e) => updateField('who', e.target.value)}
+                        className={cn(errors.who && 'border-hm-danger')}
+                      >
+                        {WHO_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </Field>
+
+                    <Field label="Mobile number" error={errors.phone}>
                       <Input
                         name="phone"
                         type="tel"
                         autoComplete="tel"
-                        placeholder="10-digit mobile"
+                        placeholder="10-digit mobile number"
                         value={form.phone}
                         onChange={(e) => updateField('phone', e.target.value)}
                         className={cn(errors.phone && 'border-hm-danger')}
                       />
                     </Field>
-                    <Field label="I'm interested in">
-                      <Select
-                        name="interest"
-                        value={form.interest}
-                        onChange={(e) => updateField('interest', e.target.value)}
-                      >
-                        {INTEREST_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </Select>
-                    </Field>
-                    <Field label="Message" error={errors.message}>
+
+                    <Field label="Description" error={errors.description}>
                       <TextArea
-                        name="message"
-                        rows={3}
-                        placeholder="Occasion, budget, quantity, or any details…"
-                        value={form.message}
-                        onChange={(e) => updateField('message', e.target.value)}
-                        className={cn('min-h-[96px]', errors.message && 'border-hm-danger')}
+                        name="description"
+                        rows={4}
+                        placeholder="Tell us about your enquiry…"
+                        value={form.description}
+                        onChange={(e) => updateField('description', e.target.value)}
+                        className={cn('min-h-[110px]', errors.description && 'border-hm-danger')}
                       />
                     </Field>
+
                     <div className="flex flex-wrap gap-2 pt-1">
                       <Button type="submit" variant="primary" className="flex-1" disabled={submitting}>
                         {submitting ? 'Sending…' : 'Submit enquiry'}

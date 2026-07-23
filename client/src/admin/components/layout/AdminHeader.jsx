@@ -1,6 +1,8 @@
-import { Bell, Menu, Moon, Search, Sun } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Bell, LogOut, Menu, Moon, Search, Sun } from 'lucide-react'
 import { useTheme } from '@/shared/hooks/useTheme'
 import { useSidebar } from '@/admin/context/SidebarContext'
+import { useAdminAuth } from '@/admin/auth/AdminAuthContext'
 import { cn } from '@/shared/utils/cn'
 
 /**
@@ -9,6 +11,20 @@ import { cn } from '@/shared/utils/cn'
 export function AdminHeader({ title = 'Dashboard', subtitle }) {
   const { toggleTheme, isDark } = useTheme()
   const { openMobile, collapsed } = useSidebar()
+  const { session, logout } = useAdminAuth()
+  const navigate = useNavigate()
+
+  const initials = (session?.name || 'A')
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  function handleLogout() {
+    logout()
+    navigate('/admin/login', { replace: true })
+  }
 
   return (
     <header
@@ -73,13 +89,27 @@ export function AdminHeader({ title = 'Dashboard', subtitle }) {
 
         <div className="ml-1 flex items-center gap-2.5 rounded-xl border border-admin-border bg-admin-bg py-1 pl-1 pr-2.5 sm:pr-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-admin-primary text-xs font-semibold text-admin-elevated">
-            SA
+            {initials}
           </div>
           <div className="hidden min-w-0 sm:block">
-            <p className="truncate text-xs font-semibold text-admin-text">Super Admin</p>
-            <p className="truncate text-[10px] text-admin-text-muted">admin@handmade.in</p>
+            <p className="truncate text-xs font-semibold text-admin-text">
+              {session?.name || 'Admin'}
+            </p>
+            <p className="truncate text-[10px] text-admin-text-muted">
+              {session?.email || ''}
+            </p>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl text-admin-text-muted transition-colors hover:bg-admin-muted hover:text-admin-danger"
+          aria-label="Sign out"
+          title="Sign out"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
       </div>
     </header>
   )

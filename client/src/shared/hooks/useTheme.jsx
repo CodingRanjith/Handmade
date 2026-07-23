@@ -2,13 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 const ThemeContext = createContext(null)
 
-const STORAGE_KEY = 'hm_theme'
+const STORAGE_KEY = 'hm_theme_v2'
 
 function getInitialTheme() {
   if (typeof window === 'undefined') return 'light'
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored === 'light' || stored === 'dark') return stored
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  // Default to light — do not follow OS dark preference
+  return 'light'
 }
 
 export function ThemeProvider({ children }) {

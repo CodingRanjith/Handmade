@@ -2,6 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AdminLayout } from '@/admin/components/layout'
 import { AdminDashboardPage } from '@/admin/pages/DashboardPage'
 import { AdminPlaceholderPage } from '@/admin/pages/PlaceholderPage'
+import { AdminLoginPage } from '@/admin/pages/AdminLoginPage'
+import { RequireAdminAuth } from '@/admin/auth/RequireAdminAuth'
 import { ProductsPage as AdminProductsPage } from '@/admin/features/products/ProductsPage'
 import {
   ProductCreatePage,
@@ -61,7 +63,16 @@ export function AppRouter() {
 
       <Route path="/design-system" element={<DesignSystemPage />} />
 
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+
+      <Route
+        path="/admin"
+        element={
+          <RequireAdminAuth>
+            <AdminLayout />
+          </RequireAdminAuth>
+        }
+      >
         <Route index element={<AdminDashboardPage />} />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="products/new" element={<ProductCreatePage />} />
