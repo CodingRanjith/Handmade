@@ -33,9 +33,13 @@ function resolvePageMeta(pathname) {
 }
 
 function AdminShell() {
-  const { collapsed } = useSidebar()
+  const { collapsed, closeMobile } = useSidebar()
   const location = useLocation()
   const meta = resolvePageMeta(location.pathname)
+
+  useEffect(() => {
+    closeMobile()
+  }, [location.pathname, closeMobile])
 
   return (
     <div className="admin-shell min-h-svh bg-admin-bg text-admin-text">

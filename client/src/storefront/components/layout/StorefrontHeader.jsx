@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   Bell,
   Heart,
@@ -22,15 +22,25 @@ export function StorefrontHeader() {
   const { toggleTheme, isDark } = useTheme()
   const { count, openCart } = useCart()
   const navigate = useNavigate()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+
+  useEffect(() => {
+    setOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!open) return undefined
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
     }
   }, [open])
 
@@ -56,10 +66,11 @@ export function StorefrontHeader() {
         <button
           type="button"
           className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-hm-text hover:bg-hm-muted lg:hidden"
-          aria-label="Open menu"
-          onClick={() => setOpen(true)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
         >
-          <Menu className="h-5 w-5" />
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
 
         <Link to="/" className="min-w-0 shrink-0">
@@ -134,22 +145,33 @@ export function StorefrontHeader() {
         </div>
       </div>
 
-      <nav className="hidden border-t border-hm-border lg:block" aria-label="Primary">
-        <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-6 lg:px-8">
-          {primaryNav.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                cn(
-                  'shrink-0 border-b-2 border-transparent px-3 py-3 text-[13px] font-semibold tracking-wide text-hm-text-muted transition hover:text-hm-primary',
-                  isActive && 'border-hm-accent text-hm-primary',
-                )
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+      {/* Category menubar — always visible; scrolls horizontally on small screens */}
+      <nav className="relative border-t border-hm-border" aria-label="Primary">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-6 bg-gradient-to-r from-hm-elevated to-transparent lg:hidden"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-6 bg-gradient-to-l from-hm-elevated to-transparent lg:hidden"
+          aria-hidden
+        />
+        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+          <div className="flex items-stretch gap-0.5 overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-none [-webkit-overflow-scrolling:touch] sm:gap-1">
+            {primaryNav.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  cn(
+                    'inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 text-[12px] font-semibold tracking-wide text-hm-text-muted transition hover:text-hm-primary sm:px-3.5 sm:text-[13px]',
+                    isActive && 'border-hm-accent text-hm-primary',
+                  )
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
         </div>
       </nav>
 
@@ -161,9 +183,14 @@ export function StorefrontHeader() {
             className="fixed inset-0 z-40 bg-hm-overlay lg:hidden"
             onClick={() => setOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 z-50 flex w-[min(300px,100vw)] flex-col overflow-y-auto border-r border-hm-border bg-hm-elevated p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))] lg:hidden">
-            <div className="mb-5 flex items-center justify-between">
-              <p className="font-display text-2xl text-hm-text">HandMade</p>
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="fixed inset-y-0 left-0 z-50 flex w-[min(320px,92vw)] flex-col overflow-y-auto border-r border-hm-border bg-hm-elevated shadow-hm-elevated lg:hidden"
+          >
+            <div className="flex items-center justify-between border-b border-hm-border px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))]">
+              <p className="font-display text-2xl text-hm-text">Menu</p>
               <button
                 type="button"
                 aria-label="Close"
@@ -174,71 +201,94 @@ export function StorefrontHeader() {
               </button>
             </div>
 
-            <form onSubmit={onSearch} className="relative mb-5">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hm-text-subtle" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search gifts…"
-                className="h-11 w-full rounded-xl border border-hm-border bg-hm-bg pl-10 pr-3 text-sm outline-none focus:border-hm-accent"
-                aria-label="Search"
-              />
-            </form>
+            <div className="flex flex-1 flex-col p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
+              <form onSubmit={onSearch} className="relative mb-4">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hm-text-subtle" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search gifts…"
+                  className="h-11 w-full rounded-xl border border-hm-border bg-hm-bg pl-10 pr-3 text-sm outline-none focus:border-hm-accent"
+                  aria-label="Search"
+                />
+              </form>
 
-            <nav className="flex flex-col">
-              {primaryNav.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setOpen(false)}
-                  className="border-b border-hm-border/60 py-3.5 text-base font-medium text-hm-text"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                to="/account"
-                onClick={() => setOpen(false)}
-                className="border-b border-hm-border/60 py-3.5 text-base font-medium text-hm-text"
-              >
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-hm-text-subtle">
+                Shop
+              </p>
+              <nav className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-hm-border bg-hm-bg">
+                {primaryNav.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        'border-b border-hm-border/60 px-4 py-3.5 text-base font-medium last:border-0',
+                        isActive ? 'bg-hm-primary/8 text-hm-primary' : 'text-hm-text',
+                      )
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-hm-text-subtle">
                 Account
-              </Link>
-              <Link
-                to="/reminders"
-                onClick={() => setOpen(false)}
-                className="border-b border-hm-border/60 py-3.5 text-base font-medium text-hm-text"
-              >
-                Notifications
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false)
-                  openCart()
-                }}
-                className="border-b border-hm-border/60 py-3.5 text-left text-base font-medium text-hm-text"
-              >
-                Bag ({count})
-              </button>
-              <Link
-                to="/login"
-                onClick={() => setOpen(false)}
-                className="border-b border-hm-border/60 py-3.5 text-base font-medium text-hm-text"
-              >
-                Sign in
-              </Link>
-              <button
-                type="button"
-                onClick={() => {
-                  toggleTheme()
-                  setOpen(false)
-                }}
-                className="py-3.5 text-left text-base font-medium text-hm-text"
-              >
-                {isDark ? 'Light mode' : 'Dark mode'}
-              </button>
-            </nav>
+              </p>
+              <nav className="flex flex-col overflow-hidden rounded-2xl border border-hm-border bg-hm-bg">
+                <Link
+                  to="/account"
+                  onClick={() => setOpen(false)}
+                  className="border-b border-hm-border/60 px-4 py-3.5 text-base font-medium text-hm-text"
+                >
+                  My account
+                </Link>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setOpen(false)}
+                  className="border-b border-hm-border/60 px-4 py-3.5 text-base font-medium text-hm-text"
+                >
+                  Wishlist
+                </Link>
+                <Link
+                  to="/reminders"
+                  onClick={() => setOpen(false)}
+                  className="border-b border-hm-border/60 px-4 py-3.5 text-base font-medium text-hm-text"
+                >
+                  Notifications
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    openCart()
+                  }}
+                  className="border-b border-hm-border/60 px-4 py-3.5 text-left text-base font-medium text-hm-text"
+                >
+                  Bag ({count})
+                </button>
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="border-b border-hm-border/60 px-4 py-3.5 text-base font-medium text-hm-text"
+                >
+                  Sign in
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleTheme()
+                    setOpen(false)
+                  }}
+                  className="px-4 py-3.5 text-left text-base font-medium text-hm-text"
+                >
+                  {isDark ? 'Light mode' : 'Dark mode'}
+                </button>
+              </nav>
+            </div>
           </aside>
         </>
       ) : null}

@@ -17,6 +17,28 @@ export function SidebarProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, String(collapsed))
   }, [collapsed])
 
+  useEffect(() => {
+    if (!mobileOpen) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setMobileOpen(false)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => !prev)
   }, [])

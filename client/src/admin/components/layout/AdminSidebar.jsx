@@ -44,7 +44,7 @@ function NavItem({ item, collapsed, onNavigate }) {
       title={collapsed ? item.label : undefined}
       className={({ isActive }) =>
         cn(
-          'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200',
+          'group relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200',
           collapsed && 'justify-center px-2',
           isActive
             ? 'bg-admin-sidebar-active/15 text-admin-sidebar-active'
@@ -85,7 +85,7 @@ function SidebarContent({ collapsed, onNavigate, onCloseMobile }) {
         <button
           type="button"
           onClick={onCloseMobile}
-          className="rounded-lg p-1.5 text-admin-sidebar-muted hover:bg-white/5 hover:text-admin-sidebar-text lg:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-admin-sidebar-muted hover:bg-white/5 hover:text-admin-sidebar-text lg:hidden"
           aria-label="Close sidebar"
         >
           <X className="h-5 w-5" />
@@ -173,7 +173,7 @@ export function AdminSidebar() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="fixed inset-y-0 left-0 z-50 w-[280px] bg-admin-sidebar lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-[min(280px,92vw)] bg-admin-sidebar pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] lg:hidden"
             >
               <SidebarContent collapsed={false} onNavigate={closeMobile} onCloseMobile={closeMobile} />
             </motion.aside>

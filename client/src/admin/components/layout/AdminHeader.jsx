@@ -21,7 +21,7 @@ export function AdminHeader({ title = 'Dashboard', subtitle }) {
         <button
           type="button"
           onClick={openMobile}
-          className="rounded-xl p-2 text-admin-text-muted transition-colors hover:bg-admin-muted hover:text-admin-text lg:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl text-admin-text-muted transition-colors hover:bg-admin-muted hover:text-admin-text lg:hidden"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
