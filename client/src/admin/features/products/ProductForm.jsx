@@ -2,12 +2,12 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  PRODUCT_CATEGORIES,
   PRODUCT_STATUSES,
   productDefaults,
   productSchema,
   slugify,
 } from '@/admin/features/products/productSchema'
+import { listCategories } from '@/admin/features/categories/categoryStore'
 import { Input, Textarea, Select, Checkbox } from '@/shared/components/forms/Field'
 import { Button } from '@/shared/components/ui/Button'
 
@@ -25,6 +25,10 @@ export function ProductForm({
   submitLabel = 'Save product',
   isSubmitting = false,
 }) {
+  const categories = listCategories()
+    .filter((c) => c.status === 'active')
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+
   const {
     register,
     handleSubmit,
@@ -57,9 +61,9 @@ export function ProductForm({
           <Input label="SKU" error={errors.sku?.message} {...register('sku')} />
           <Select label="Category" error={errors.category?.message} {...register('category')}>
             <option value="">Select category</option>
-            {PRODUCT_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
               </option>
             ))}
           </Select>

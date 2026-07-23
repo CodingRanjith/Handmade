@@ -8,7 +8,7 @@ import {
   Truck,
   Users,
 } from 'lucide-react'
-import { catalogProducts } from '@/storefront/data/catalog'
+import { getStorefrontProducts } from '@/shared/catalog/liveCatalog'
 import { ProductCard } from '@/storefront/components/product/ProductCard'
 import { Button } from '@/shared/components/ui/Button'
 
@@ -22,7 +22,7 @@ const solutions = [
     text: 'Onboarding hampers that feel considered — notebook, mug, treats, logo card.',
     image:
       'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=1200&q=80',
-    href: '/products?occasion=welcome',
+    href: '/categories?occasion=welcome',
   },
   {
     id: 'festival',
@@ -30,7 +30,7 @@ const solutions = [
     text: 'Diwali and year-end kits with calm packaging and optional branding.',
     image:
       'https://images.unsplash.com/photo-1608756687911-aa1599ab3bd9?auto=format&fit=crop&w=1200&q=80',
-    href: '/products?occasion=festival',
+    href: '/categories?occasion=festival',
   },
   {
     id: 'client',
@@ -38,7 +38,7 @@ const solutions = [
     text: 'Refined objects for partners and VIPs — trays, keepsakes, curated boxes.',
     image:
       'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
-    href: '/products?category=Corporate%20Gifts',
+    href: '/categories?category=Corporate%20Gifts',
   },
 ]
 
@@ -75,7 +75,7 @@ const perks = [
 ]
 
 export function CorporateGiftsPage() {
-  const products = catalogProducts.filter(
+  const products = getStorefrontProducts().filter(
     (p) => p.category === 'Corporate Gifts' || p.occasion.includes('Corporate'),
   )
 

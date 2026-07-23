@@ -101,7 +101,7 @@ export function WishlistPage() {
       <PageHero eyebrow="Saved" title="Wishlist" description="Gifts you’re considering — move them to bag when ready." />
       <div className="mx-auto max-w-3xl px-5 py-12 text-center sm:px-8">
         <p className="text-sm text-hm-text-muted">Your wishlist is empty for now.</p>
-        <Link to="/products" className="mt-6 inline-block">
+        <Link to="/categories" className="mt-6 inline-block">
           <Button variant="primary">Browse gifts</Button>
         </Link>
       </div>
@@ -160,7 +160,7 @@ export function OrderSuccessPage() {
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/account/orders"><Button variant="primary">View orders</Button></Link>
-        <Link to="/products"><Button variant="outline">Continue shopping</Button></Link>
+        <Link to="/categories"><Button variant="outline">Continue shopping</Button></Link>
       </div>
     </div>
   )

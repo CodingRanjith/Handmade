@@ -66,7 +66,7 @@ export function AboutPage() {
           Whether you’re gifting one person or five hundred, our studio helps you personalize,
           pack, and deliver with care.
         </p>
-        <Link to="/products">
+        <Link to="/categories">
           <Button variant="primary">Explore gifts</Button>
         </Link>
       </div>

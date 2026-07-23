@@ -1,26 +1,44 @@
 import { HeroBanner } from '@/storefront/components/home/HeroBanner'
 import {
   BestSellers,
+  BlogsSection,
   CorporateBand,
+  CorporateClients,
   FeaturedCategories,
-  HowItWorks,
+  GiftIdeasStrip,
+  InstagramGallery,
   NewsletterBand,
-  OccasionStrip,
+  NewArrivals,
+  OccasionCollections,
+  PersonalizedBand,
   ReviewsSection,
-  ShopPaths,
+  SurpriseDual,
+  TodaysDeals,
+  TrendingProducts,
 } from '@/storefront/components/home/HomeSections'
 
+/**
+ * Home — premium multi-section layout.
+ * Modules below are wired for IA; deeper pages ship module-by-module.
+ */
 export function HomePage() {
   return (
     <>
       <HeroBanner />
-      <ShopPaths />
-      <OccasionStrip />
-      <HowItWorks />
-      <BestSellers />
       <FeaturedCategories />
+      <PersonalizedBand />
       <CorporateBand />
+      <OccasionCollections />
+      <SurpriseDual />
+      <BestSellers />
+      <NewArrivals />
+      <TrendingProducts />
+      <TodaysDeals />
+      <CorporateClients />
       <ReviewsSection />
+      <InstagramGallery />
+      <BlogsSection />
+      <GiftIdeasStrip />
       <NewsletterBand />
     </>
   )

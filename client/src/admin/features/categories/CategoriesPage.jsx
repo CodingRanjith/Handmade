@@ -1,55 +1,21 @@
-import { createLocalStore } from '@/admin/lib/createLocalStore'
 import { createModuleHooks } from '@/admin/lib/createModuleHooks'
+import {
+  createCategory,
+  deleteCategory,
+  getCategoryById,
+  listCategories,
+  updateCategory,
+} from '@/admin/features/categories/categoryStore'
 import { AdminCrudPage, StatusBadge, TextCell } from '@/admin/components/crud/AdminCrudPage'
 
-const seed = [
-  {
-    id: 'cat_1',
-    name: 'Home Décor',
-    slug: 'home-decor',
-    description: 'Handcrafted pieces for living spaces',
-    sortOrder: 1,
-    status: 'active',
-    productCount: 48,
-    updatedAt: '2026-07-10T10:00:00.000Z',
-    createdAt: '2026-01-01T10:00:00.000Z',
-  },
-  {
-    id: 'cat_2',
-    name: 'Corporate Gifts',
-    slug: 'corporate-gifts',
-    description: 'Premium gifting for teams and clients',
-    sortOrder: 2,
-    status: 'active',
-    productCount: 32,
-    updatedAt: '2026-07-08T10:00:00.000Z',
-    createdAt: '2026-01-01T10:00:00.000Z',
-  },
-  {
-    id: 'cat_3',
-    name: 'Personalized Gifts',
-    slug: 'personalized-gifts',
-    description: 'Custom monograms and keepsakes',
-    sortOrder: 3,
-    status: 'active',
-    productCount: 27,
-    updatedAt: '2026-06-20T10:00:00.000Z',
-    createdAt: '2026-01-01T10:00:00.000Z',
-  },
-  {
-    id: 'cat_4',
-    name: 'Jewellery',
-    slug: 'jewellery',
-    description: 'Artisan jewellery and accessories',
-    sortOrder: 4,
-    status: 'draft',
-    productCount: 12,
-    updatedAt: '2026-05-14T10:00:00.000Z',
-    createdAt: '2026-02-01T10:00:00.000Z',
-  },
-]
+const store = {
+  list: listCategories,
+  getById: getCategoryById,
+  create: createCategory,
+  update: updateCategory,
+  remove: deleteCategory,
+}
 
-const store = createLocalStore('hm_admin_categories_v1', seed, 'cat')
 const hooks = createModuleHooks('categories', store)
 
 const defaults = {
@@ -59,12 +25,14 @@ const defaults = {
   sortOrder: 0,
   status: 'active',
   productCount: 0,
+  imageUrl: '',
 }
 
 const fields = [
   { name: 'name', label: 'Name', required: true },
   { name: 'slug', label: 'Slug', required: true },
   { name: 'description', label: 'Description', type: 'textarea' },
+  { name: 'imageUrl', label: 'Image URL' },
   { name: 'sortOrder', label: 'Sort order', type: 'number' },
   {
     name: 'status',
@@ -83,16 +51,23 @@ const columns = [
     accessorKey: 'name',
     header: 'Category',
     cell: ({ row }) => (
-      <div>
-        <TextCell>{row.original.name}</TextCell>
-        <p className="text-xs text-admin-text-muted">{row.original.slug}</p>
+      <div className="flex items-center gap-3">
+        <div className="h-11 w-11 overflow-hidden rounded-lg bg-admin-muted">
+          {row.original.imageUrl ? (
+            <img
+              src={row.original.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : null}
+        </div>
+        <div>
+          <TextCell>{row.original.name}</TextCell>
+          <p className="text-xs text-admin-text-muted">{row.original.slug}</p>
+        </div>
       </div>
     ),
-  },
-  {
-    accessorKey: 'productCount',
-    header: 'Products',
-    cell: ({ getValue }) => <TextCell muted>{getValue()}</TextCell>,
   },
   {
     accessorKey: 'sortOrder',
@@ -115,7 +90,7 @@ export function CategoriesPage() {
   return (
     <AdminCrudPage
       title="Category Management"
-      description="Organize the HandMade catalog into shoppable categories."
+      description="Categories created here appear on the customer Categories page."
       addLabel="Add Category"
       data={data}
       isLoading={isLoading}

@@ -13,12 +13,14 @@ import {
   ZoomIn,
 } from 'lucide-react'
 import {
-  catalogProducts,
-  getCatalogProduct,
-  getRelatedProducts,
   getUnitPrice,
   productReviews,
 } from '@/storefront/data/catalog'
+import {
+  getStorefrontProduct,
+  getStorefrontProducts,
+  getStorefrontRelated,
+} from '@/shared/catalog/liveCatalog'
 import { ProductCard } from '@/storefront/components/product/ProductCard'
 import { pushRecentlyViewed, getRecentlyViewedIds } from '@/storefront/hooks/useRecentlyViewed'
 import { useCart } from '@/storefront/hooks/useCart'
@@ -34,7 +36,7 @@ export function ProductDetailsPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addItem } = useCart()
-  const product = getCatalogProduct(id)
+  const product = getStorefrontProduct(id)
 
   const [activeImage, setActiveImage] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
@@ -58,13 +60,14 @@ export function ProductDetailsPage() {
   }, [product?.id])
 
   const unitPrice = product ? getUnitPrice(product, qty) : 0
-  const related = product ? getRelatedProducts(product) : []
+  const related = product ? getStorefrontRelated(product) : []
   const reviews = product ? productReviews[product.id] || [] : []
   const recentlyViewed = useMemo(() => {
     if (!product) return []
+    const all = getStorefrontProducts()
     return getRecentlyViewedIds()
       .filter((rid) => rid !== product.id)
-      .map((rid) => catalogProducts.find((p) => p.id === rid))
+      .map((rid) => all.find((p) => p.id === rid))
       .filter(Boolean)
       .slice(0, 4)
   }, [product])
@@ -73,7 +76,7 @@ export function ProductDetailsPage() {
     return (
       <div className="mx-auto flex min-h-[70svh] max-w-lg flex-col items-center justify-center px-6 py-32 text-center">
         <h1 className="font-display text-4xl text-hm-text">Gift not found</h1>
-        <Link to="/products" className="mt-6">
+        <Link to="/categories" className="mt-6">
           <Button variant="primary">Back to shop</Button>
         </Link>
       </div>
@@ -97,7 +100,7 @@ export function ProductDetailsPage() {
   }
 
   return (
-    <div className="pb-16 pt-24">
+    <div className="pb-16 pt-8">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <button
           type="button"

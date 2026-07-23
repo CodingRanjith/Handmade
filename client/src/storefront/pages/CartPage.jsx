@@ -21,7 +21,7 @@ export function CartPage() {
           <div className="rounded-2xl border border-dashed border-hm-border bg-hm-elevated p-10 text-center">
             <ShoppingBag className="mx-auto h-8 w-8 text-hm-accent" />
             <p className="mt-4 text-sm text-hm-text-muted">No items yet.</p>
-            <Link to="/products" className="mt-6 inline-block">
+            <Link to="/categories" className="mt-6 inline-block">
               <Button variant="primary">Shop gifts</Button>
             </Link>
           </div>

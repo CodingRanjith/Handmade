@@ -168,6 +168,9 @@ function readStore() {
 
 function writeStore(products) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('hm-catalog-changed'))
+  }
   return products
 }
 

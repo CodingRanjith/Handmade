@@ -20,6 +20,9 @@ export function createLocalStore(storageKey, seed, idPrefix = 'row') {
 
   function writeStore(rows) {
     localStorage.setItem(storageKey, JSON.stringify(rows))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('hm-catalog-changed'))
+    }
     return rows
   }
 

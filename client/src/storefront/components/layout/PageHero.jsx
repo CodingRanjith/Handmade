@@ -3,7 +3,7 @@ import { cn } from '@/shared/utils/cn'
 
 export function PageHero({ eyebrow, title, description, actions, className }) {
   return (
-    <section className={cn('border-b border-hm-border bg-hm-muted/40 pt-28 pb-10', className)}>
+    <section className={cn('border-b border-hm-border bg-hm-muted/40 py-10', className)}>
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {eyebrow ? (
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-hm-accent">{eyebrow}</p>

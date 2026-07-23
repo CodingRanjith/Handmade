@@ -1,53 +1,137 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Play } from 'lucide-react'
+import { useRef } from 'react'
 import { Button } from '@/shared/components/ui/Button'
+import { Container } from '@/storefront/components/ui/Container'
+import { trendingCollections, occasions } from '@/storefront/data/home'
 
 const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=2000&q=80'
+  'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=1400&q=80'
 
-/** Clean hero — brand-first, no 3D / parallax clutter */
+/**
+ * FNP-style hero: horizontal rounded promo cards + occasion icon strip.
+ * Content unchanged — same HandMade copy, CTAs, and trending collections.
+ */
 export function HeroBanner() {
-  return (
-    <section className="relative min-h-[88svh] overflow-hidden bg-hm-muted">
-      <img
-        src={HERO_IMAGE}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        fetchPriority="high"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-hm-bg via-hm-bg/80 to-hm-bg/30" />
-      <div className="absolute inset-0 bg-gradient-to-t from-hm-bg via-transparent to-hm-bg/25" />
+  const scrollerRef = useRef(null)
 
-      <div className="relative z-10 mx-auto flex min-h-[88svh] max-w-7xl flex-col justify-center px-5 pb-16 pt-28 sm:px-8">
-        <div className="max-w-xl">
-          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-hm-accent">
-            <Sparkles className="h-3.5 w-3.5" />
-            Curated gifting
-          </p>
-          <p className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-hm-text sm:text-6xl md:text-7xl lg:text-8xl">
-            HandMade
-          </p>
-          <h1 className="mt-5 max-w-md text-balance text-lg font-medium leading-snug text-hm-text sm:text-xl md:text-2xl">
-            Beautiful gifts, ready to personalize and buy.
-          </h1>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-hm-text-muted sm:text-base">
-            Personalized keepsakes, corporate kits, and home pieces — packed with care.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/products">
-              <Button variant="primary" size="lg">
-                Shop gifts
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link to="/corporate-gifts">
-              <Button variant="outline" size="lg">
-                Corporate gifting
-              </Button>
-            </Link>
+  function scrollBy(dir) {
+    const el = scrollerRef.current
+    if (!el) return
+    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.85, 520), behavior: 'smooth' })
+  }
+
+  return (
+    <section className="bg-hm-bg pb-2 pt-4 sm:pt-5">
+      <Container>
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Previous"
+            onClick={() => scrollBy(-1)}
+            className="absolute left-0 top-1/2 z-10 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-hm-border bg-hm-elevated text-hm-text shadow-hm-soft hover:border-hm-accent md:flex"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next"
+            onClick={() => scrollBy(1)}
+            className="absolute right-0 top-1/2 z-10 hidden h-10 w-10 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-hm-border bg-hm-elevated text-hm-text shadow-hm-soft hover:border-hm-accent md:flex"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+
+          <div
+            ref={scrollerRef}
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-none"
+          >
+            {/* Primary brand card — same content as before */}
+            <article className="relative flex min-h-[220px] w-[88%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border bg-hm-muted shadow-hm-card sm:min-h-[260px] sm:w-[70%] lg:w-[58%]">
+              <div className="relative z-10 flex w-full flex-col justify-center p-6 sm:max-w-[55%] sm:p-8 md:p-10">
+                <p className="font-display text-3xl leading-none tracking-tight text-hm-text sm:text-4xl md:text-5xl">
+                  HandMade
+                </p>
+                <h1 className="mt-3 text-base font-semibold leading-snug text-hm-text sm:text-lg md:text-xl">
+                  India&apos;s most premium gifting experience.
+                </h1>
+                <p className="mt-2 hidden text-sm leading-relaxed text-hm-text-muted sm:block">
+                  Personalized keepsakes, corporate kits, and unforgettable surprises — crafted to
+                  feel one-of-one.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Link to="/categories">
+                    <Button variant="primary" size="sm">
+                      Explore gifts
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                  <Link to="/surprise">
+                    <Button variant="outline" size="sm">
+                      <Play className="h-3.5 w-3.5" />
+                      Plan a surprise
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              <img
+                src={HERO_IMAGE}
+                alt=""
+                className="absolute inset-y-0 right-0 hidden h-full w-[50%] object-cover sm:block"
+                fetchPriority="high"
+              />
+              <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[50%] bg-gradient-to-r from-hm-muted to-transparent sm:block" />
+            </article>
+
+            {/* Trending collection cards — same data */}
+            {trendingCollections.map((item) => (
+              <Link
+                key={item.id}
+                to={item.path}
+                className="group relative flex min-h-[220px] w-[78%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border shadow-hm-card sm:min-h-[260px] sm:w-[52%] lg:w-[38%]"
+              >
+                <img
+                  src={item.image}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                <div className="relative z-10 flex w-full flex-col justify-end p-6 sm:p-8">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">
+                    Trending collections
+                  </p>
+                  <h2 className="mt-1 font-display text-3xl text-white sm:text-4xl">{item.title}</h2>
+                  <p className="mt-1 text-sm text-white/75">{item.subtitle}</p>
+                  <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-hm-elevated px-3.5 py-2 text-xs font-semibold text-hm-text">
+                    Explore <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
-      </div>
+
+        {/* Occasion shortcut strip — same occasion labels/paths */}
+        <div className="mt-5 flex gap-4 overflow-x-auto pb-2 scrollbar-none sm:mt-6 sm:justify-center sm:gap-5">
+          {occasions.map((item) => (
+            <Link
+              key={item.id}
+              to={item.path}
+              className="group flex w-[72px] shrink-0 flex-col items-center gap-2 sm:w-[84px]"
+            >
+              <span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border border-hm-border bg-hm-elevated shadow-hm-soft transition group-hover:border-hm-accent sm:h-[84px] sm:w-[84px]">
+                <span className="font-display text-2xl text-hm-accent sm:text-3xl">
+                  {item.label.charAt(0)}
+                </span>
+              </span>
+              <span className="text-center text-[11px] font-semibold leading-tight text-hm-text sm:text-xs">
+                {item.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </Container>
     </section>
   )
 }

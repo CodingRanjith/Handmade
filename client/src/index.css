@@ -235,6 +235,13 @@ body {
   border: 1px solid var(--hm-border);
 }
 
+.glass-strong {
+  background: var(--hm-surface-solid);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--hm-border-strong);
+}
+
 .perspective-\[1200px\] {
   perspective: 1200px;
 }
