@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   flexRender,
@@ -8,8 +8,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { Download, Pencil, Plus, Search, Trash2, Upload } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { PRODUCT_STATUS_LABELS } from '@/admin/features/products/productSchema'
+import {
+  bulkImportProducts,
+  productImportHeaders,
+  productImportSampleRows,
+} from '@/admin/features/products/productStore'
 import { useDeleteProduct, useProducts } from '@/admin/features/products/useProducts'
+import { downloadCsv, parseCsv, readTextFile } from '@/admin/lib/bulkCsv'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { Modal } from '@/shared/components/ui/Modal'
@@ -18,21 +26,32 @@ import { formatCurrency } from '@/shared/lib/utils'
 import { cn } from '@/shared/utils/cn'
 
 function statusTone(status) {
-  if (status === 'active') return 'success'
+  if (status === 'published' || status === 'active') return 'success'
   if (status === 'draft') return 'warning'
   return 'default'
 }
 
+function statusLabel(status) {
+  return PRODUCT_STATUS_LABELS[status] || status
+}
+
 export function ProductsPage() {
+  const qc = useQueryClient()
   const navigate = useNavigate()
   const { data = [], isLoading } = useProducts()
   const deleteMutation = useDeleteProduct()
   const [globalFilter, setGlobalFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [importMessage, setImportMessage] = useState('')
+  const [importError, setImportError] = useState('')
+  const inputRef = useRef(null)
 
   const filtered = useMemo(() => {
     if (statusFilter === 'all') return data
+    if (statusFilter === 'published') {
+      return data.filter((p) => p.status === 'published' || p.status === 'active')
+    }
     return data.filter((p) => p.status === statusFilter)
   }, [data, statusFilter])
 
@@ -61,11 +80,20 @@ export function ProductsPage() {
         ),
       },
       {
-        accessorKey: 'category',
-        header: 'Category',
-        cell: ({ getValue }) => (
-          <span className="text-admin-text-muted">{getValue()}</span>
-        ),
+        id: 'categories',
+        header: 'Categories',
+        cell: ({ row }) => {
+          const cats = Array.isArray(row.original.categories) && row.original.categories.length
+            ? row.original.categories
+            : row.original.category
+              ? [row.original.category]
+              : []
+          return (
+            <span className="text-admin-text-muted">
+              {cats.length ? cats.join(', ') : '—'}
+            </span>
+          )
+        },
       },
       {
         accessorKey: 'price',
@@ -90,7 +118,9 @@ export function ProductsPage() {
       {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ getValue }) => <Badge tone={statusTone(getValue())}>{getValue()}</Badge>,
+        cell: ({ getValue }) => (
+          <Badge tone={statusTone(getValue())}>{statusLabel(getValue())}</Badge>
+        ),
       },
       {
         id: 'flags',
@@ -148,6 +178,27 @@ export function ProductsPage() {
     setDeleteTarget(null)
   }
 
+  async function handleImportFile(file) {
+    if (!file) return
+    setImportMessage('')
+    setImportError('')
+    try {
+      const text = await readTextFile(file)
+      const rows = parseCsv(text)
+      if (rows.length === 0) throw new Error('The CSV file is empty.')
+      rows.forEach((row, index) => {
+        if (!row.name || !row.description || !row.price) {
+          throw new Error(`Row ${index + 2}: name, description, and price are required.`)
+        }
+      })
+      bulkImportProducts(rows)
+      await qc.invalidateQueries({ queryKey: ['products'] })
+      setImportMessage(`Imported ${rows.length} product${rows.length === 1 ? '' : 's'}.`)
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Import failed.')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -158,13 +209,41 @@ export function ProductsPage() {
           <p className="mt-1 text-sm text-admin-text-muted">
             Create, edit, and manage catalog inventory for HandMade.
           </p>
+          {importMessage ? <p className="mt-1 text-xs text-admin-success">{importMessage}</p> : null}
+          {importError ? <p className="mt-1 text-xs text-admin-danger">{importError}</p> : null}
         </div>
-        <Link to="/admin/products/new">
-          <Button variant="accent" size="sm">
-            <Plus className="h-4 w-4" />
-            Add Product
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="sr-only"
+            onChange={(e) => {
+              void handleImportFile(e.target.files?.[0])
+              e.target.value = ''
+            }}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              downloadCsv('products-sample-template.csv', productImportSampleRows, productImportHeaders)
+            }
+          >
+            <Download className="h-4 w-4" />
+            Sample Template
           </Button>
-        </Link>
+          <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
+            <Upload className="h-4 w-4" />
+            Import CSV
+          </Button>
+          <Link to="/admin/products/new">
+            <Button variant="accent" size="sm">
+              <Plus className="h-4 w-4" />
+              Add Product
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-admin-border bg-admin-elevated p-4 shadow-admin sm:flex-row sm:items-center">
@@ -184,7 +263,7 @@ export function ProductsPage() {
           className="h-10 rounded-lg border border-admin-border bg-admin-bg px-3 text-sm outline-none focus:border-admin-accent"
         >
           <option value="all">All statuses</option>
-          <option value="active">Active</option>
+          <option value="published">Published</option>
           <option value="draft">Draft</option>
           <option value="archived">Archived</option>
         </select>

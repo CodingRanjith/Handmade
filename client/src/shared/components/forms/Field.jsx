@@ -96,3 +96,18 @@ export function Checkbox({ label, className, ...props }) {
     </label>
   )
 }
+
+/** Radio option — use inside a fieldset with a shared `name`. */
+export const Radio = forwardRef(function Radio({ label, className, ...props }, ref) {
+  return (
+    <label className={cn('inline-flex cursor-pointer items-center gap-2 text-sm text-admin-text', className)}>
+      <input
+        ref={ref}
+        type="radio"
+        className="h-4 w-4 shrink-0 border-admin-border text-admin-accent accent-admin-accent focus:ring-admin-ring"
+        {...props}
+      />
+      <span>{label}</span>
+    </label>
+  )
+})

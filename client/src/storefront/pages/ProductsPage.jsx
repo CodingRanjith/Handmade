@@ -1,19 +1,19 @@
-import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Filter, Search, SlidersHorizontal, X } from 'lucide-react'
-import { filterStorefrontCatalog } from '@/shared/catalog/liveCatalog'
 import { ProductCard } from '@/storefront/components/product/ProductCard'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/utils/cn'
 import {
-  useStorefrontCategoryNames,
+  useFilteredStorefrontCatalog,
+  useStorefrontCategories,
   useStorefrontProducts,
 } from '@/shared/catalog/useLiveCatalog'
 
 export function ProductsPage() {
   const [params, setParams] = useSearchParams()
   const [mobileFilters, setMobileFilters] = useState(false)
-  const categoryNames = useStorefrontCategoryNames()
+  const categories = useStorefrontCategories()
   const allProducts = useStorefrontProducts()
 
   const state = {
@@ -22,6 +22,16 @@ export function ProductsPage() {
     sort: params.get('sort') || 'featured',
     inStock: params.get('inStock') === '1',
   }
+
+  const activeCategory =
+    state.category !== 'All'
+      ? categories.find(
+          (c) =>
+            c.name === state.category ||
+            c.slug === state.category ||
+            c.id === state.category,
+        )
+      : null
 
   function patch(updates) {
     const next = new URLSearchParams(params)
@@ -50,16 +60,20 @@ export function ProductsPage() {
     setParams(next, { replace: true })
   }
 
-  const products = useMemo(
-    () =>
-      filterStorefrontCatalog({
-        search: state.search,
-        category: state.category,
-        sort: state.sort,
-        onlyInStock: state.inStock,
-      }),
-    [allProducts, state.search, state.category, state.sort, state.inStock],
-  )
+  // Resolve filter to category name so slug/id query params still match admin products
+  const categoryFilter = activeCategory?.name || state.category
+
+  const products = useFilteredStorefrontCatalog({
+    search: state.search,
+    category: categoryFilter,
+    sort: state.sort,
+    onlyInStock: state.inStock,
+  })
+
+  const totalInCategory =
+    state.category === 'All'
+      ? allProducts.length
+      : activeCategory?.productCount ?? products.length
 
   const Filters = (
     <div className="space-y-6">
@@ -67,23 +81,48 @@ export function ProductsPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-hm-text-subtle">
           Category
         </p>
-        <div className="mt-3 flex flex-col gap-1.5">
-          {categoryNames.map((cat) => (
+        {categories.length === 0 ? (
+          <p className="mt-3 text-sm text-hm-text-muted">
+            No categories yet.{' '}
+            <Link to="/admin/categories" className="font-medium text-hm-accent hover:underline">
+              Add in Admin
+            </Link>
+          </p>
+        ) : (
+          <div className="mt-3 flex flex-col gap-1.5">
             <button
-              key={cat}
               type="button"
-              onClick={() => patch({ category: cat })}
+              onClick={() => patch({ category: 'All' })}
               className={cn(
-                'rounded-lg px-3 py-2 text-left text-sm transition',
-                state.category === cat
+                'flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition',
+                state.category === 'All'
                   ? 'bg-hm-primary text-hm-bg-elevated'
                   : 'text-hm-text-muted hover:bg-hm-muted hover:text-hm-text',
               )}
             >
-              {cat}
+              <span>All</span>
+              <span className="text-xs opacity-70">{allProducts.length}</span>
             </button>
-          ))}
-        </div>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => patch({ category: cat.name })}
+                className={cn(
+                  'flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition',
+                  state.category === cat.name ||
+                    state.category === cat.slug ||
+                    state.category === cat.id
+                    ? 'bg-hm-primary text-hm-bg-elevated'
+                    : 'text-hm-text-muted hover:bg-hm-muted hover:text-hm-text',
+                )}
+              >
+                <span className="truncate pr-2">{cat.name}</span>
+                <span className="shrink-0 text-xs opacity-70">{cat.productCount}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <label className="flex items-center gap-2 text-sm text-hm-text">
         <input
@@ -114,7 +153,7 @@ export function ProductsPage() {
 
   return (
     <div>
-      <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
+      <div className="mx-auto max-w-[90rem] px-5 py-6 sm:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <label className="relative block flex-1">
             <span className="sr-only">Search</span>
@@ -123,13 +162,13 @@ export function ProductsPage() {
               value={state.search}
               onChange={(e) => patch({ search: e.target.value })}
               placeholder="Search gifts…"
-              className="h-11 w-full rounded-xl border border-hm-border bg-hm-elevated pl-10 pr-3 text-sm outline-none focus:border-hm-accent"
+              className="h-12 w-full rounded-xl border border-hm-border bg-hm-elevated pl-10 pr-3 text-[0.9375rem] outline-none focus:border-hm-accent"
             />
           </label>
           <select
             value={state.sort}
             onChange={(e) => patch({ sort: e.target.value })}
-            className="h-11 rounded-xl border border-hm-border bg-hm-elevated px-3 text-sm"
+            className="h-12 rounded-xl border border-hm-border bg-hm-elevated px-3 text-[0.9375rem]"
           >
             <option value="featured">Featured</option>
             <option value="price-asc">Price: Low to high</option>
@@ -144,10 +183,10 @@ export function ProductsPage() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 pb-16 sm:px-8 lg:grid-cols-[240px_1fr]">
+      <div className="mx-auto grid max-w-[90rem] gap-8 px-5 pb-16 sm:px-8 lg:grid-cols-[240px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 rounded-2xl border border-hm-border bg-hm-elevated p-5">
-            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-hm-text">
+          <div className="sticky top-28 rounded-2xl border border-hm-border bg-hm-elevated p-5">
+            <div className="mb-4 flex items-center gap-2 text-[0.9375rem] font-semibold text-hm-text">
               <Filter className="h-4 w-4 text-hm-accent" />
               Filters
             </div>
@@ -156,26 +195,36 @@ export function ProductsPage() {
         </aside>
 
         <div>
-          <p className="mb-5 text-sm text-hm-text-muted">
-            <span className="font-semibold text-hm-text">{products.length}</span> gifts
-            {state.category !== 'All' ? <span> in {state.category}</span> : null}
+          <p className="mb-5 text-[0.9375rem] text-hm-text-muted">
+            <span className="font-semibold text-hm-text">{products.length}</span> active gift
+            {products.length === 1 ? '' : 's'}
+            {categoryFilter !== 'All' ? <span> in {categoryFilter}</span> : null}
           </p>
           {products.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-hm-border p-12 text-center">
-              <p className="font-display text-2xl text-hm-text">No gifts match</p>
-              <Button
-                variant="primary"
-                className="mt-4"
-                onClick={() => patch({ search: '', category: 'All' })}
-              >
-                Reset
-              </Button>
+            <div className="rounded-2xl border border-dashed border-hm-border bg-hm-elevated/50 p-12 text-center">
+              <p className="font-display text-2xl text-hm-text">
+                {categoryFilter !== 'All' ? `No active gifts in ${categoryFilter}` : 'No gifts match'}
+              </p>
+              <p className="mx-auto mt-2 max-w-sm text-sm text-hm-text-muted">
+                {categoryFilter !== 'All' && totalInCategory === 0
+                  ? 'Add products in Admin and set status to Active for this category.'
+                  : 'Only active products appear here. Draft or archived items stay in Admin.'}
+              </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <Button variant="primary" onClick={() => patch({ search: '', category: 'All' })}>
+                  View all gifts
+                </Button>
+                <Link to="/admin/products">
+                  <Button variant="outline">Manage products</Button>
+                </Link>
+              </div>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid auto-rows-fr grid-cols-2 gap-5 sm:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
                 <ProductCard
                   key={product.id}
+                  className="h-full"
                   product={{
                     ...product,
                     image: product.image || product.images?.[0],

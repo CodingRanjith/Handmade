@@ -1,67 +1,26 @@
-import { createLocalStore } from '@/admin/lib/createLocalStore'
+import { useEffect, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { createModuleHooks } from '@/admin/lib/createModuleHooks'
 import { AdminCrudPage, StatusBadge, TextCell } from '@/admin/components/crud/AdminCrudPage'
+import { listProducts } from '@/admin/features/products/productStore'
+import { createReview, reviewsStore } from '@/admin/features/reviews/reviewStore'
 
-const seed = [
-  {
-    id: 'rv_1',
-    product: 'Walnut Serving Tray',
-    customer: 'Ananya Krishnan',
-    rating: 5,
-    comment: 'Beautiful finish — arrived well packed.',
-    status: 'approved',
-    updatedAt: '2026-07-18T10:00:00.000Z',
-    createdAt: '2026-07-17T10:00:00.000Z',
-  },
-  {
-    id: 'rv_2',
-    product: 'Brass Candle Set',
-    customer: 'Rahul Mehta',
-    rating: 4,
-    comment: 'Warm glow, slightly lighter than expected.',
-    status: 'pending',
-    updatedAt: '2026-07-16T10:00:00.000Z',
-    createdAt: '2026-07-16T09:00:00.000Z',
-  },
-  {
-    id: 'rv_3',
-    product: 'Corporate Welcome Hamper',
-    customer: 'Priya Nair',
-    rating: 5,
-    comment: 'Perfect for our new hires.',
-    status: 'approved',
-    updatedAt: '2026-07-12T10:00:00.000Z',
-    createdAt: '2026-07-11T10:00:00.000Z',
-  },
-]
-
-const store = createLocalStore('hm_admin_reviews_v1', seed, 'rv')
-const hooks = createModuleHooks('reviews', store)
+const hooks = createModuleHooks('reviews', {
+  list: () => reviewsStore.list(),
+  getById: (id) => reviewsStore.getById(id),
+  create: (payload) => createReview(payload),
+  update: (id, data) => reviewsStore.update(id, data),
+  remove: (id) => reviewsStore.remove(id),
+})
 
 const defaults = {
   product: '',
+  productId: '',
   customer: '',
   rating: 5,
   comment: '',
-  status: 'pending',
+  status: 'approved',
 }
-
-const fields = [
-  { name: 'product', label: 'Product', required: true },
-  { name: 'customer', label: 'Customer', required: true },
-  { name: 'rating', label: 'Rating (1-5)', type: 'number', required: true },
-  { name: 'comment', label: 'Comment', type: 'textarea' },
-  {
-    name: 'status',
-    label: 'Status',
-    type: 'select',
-    options: [
-      { value: 'pending', label: 'Pending' },
-      { value: 'approved', label: 'Approved' },
-      { value: 'rejected', label: 'Rejected' },
-    ],
-  },
-]
 
 const columns = [
   {
@@ -94,25 +53,100 @@ const columns = [
 ]
 
 export function ReviewsPage() {
+  const qc = useQueryClient()
   const { data = [], isLoading } = hooks.useList()
   const createMutation = hooks.useCreate()
   const updateMutation = hooks.useUpdate()
   const deleteMutation = hooks.useRemove()
 
+  useEffect(() => {
+    const onChange = () => {
+      qc.invalidateQueries({ queryKey: ['reviews'] })
+    }
+    window.addEventListener('hm-catalog-changed', onChange)
+    return () => window.removeEventListener('hm-catalog-changed', onChange)
+  }, [qc])
+
+  const productOptions = useMemo(() => {
+    try {
+      return listProducts()
+        .map((p) => ({
+          value: p.id,
+          label: p.name,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label))
+    } catch {
+      return []
+    }
+  }, [data])
+
+  const fields = useMemo(
+    () => [
+      {
+        name: 'productId',
+        label: 'Product',
+        type: 'select',
+        required: true,
+        options: productOptions,
+      },
+      { name: 'customer', label: 'Customer', required: true },
+      { name: 'rating', label: 'Rating (1-5)', type: 'number', required: true },
+      { name: 'comment', label: 'Comment', type: 'textarea' },
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'select',
+        options: [
+          { value: 'pending', label: 'Pending' },
+          { value: 'approved', label: 'Approved' },
+          { value: 'rejected', label: 'Rejected' },
+        ],
+      },
+    ],
+    [productOptions],
+  )
+
+  const wrappedCreate = {
+    ...createMutation,
+    mutateAsync: async (payload) => {
+      const product = listProducts().find((p) => p.id === payload.productId)
+      return createMutation.mutateAsync({
+        ...payload,
+        productId: payload.productId || product?.id || '',
+        product: product?.name || payload.product || '',
+      })
+    },
+  }
+
+  const wrappedUpdate = {
+    ...updateMutation,
+    mutateAsync: async ({ id, data }) => {
+      const product = listProducts().find((p) => p.id === data.productId)
+      return updateMutation.mutateAsync({
+        id,
+        data: {
+          ...data,
+          productId: data.productId || product?.id || '',
+          product: product?.name || data.product || '',
+        },
+      })
+    },
+  }
+
   return (
     <AdminCrudPage
       title="Reviews"
-      description="Moderate product reviews before they appear on the storefront."
+      description="Product-wise reviews shown on the storefront when status is Approved."
       addLabel="Add Review"
       data={data}
       isLoading={isLoading}
-      createMutation={createMutation}
-      updateMutation={updateMutation}
+      createMutation={wrappedCreate}
+      updateMutation={wrappedUpdate}
       deleteMutation={deleteMutation}
       columns={columns}
       fields={fields}
       defaults={defaults}
-      searchPlaceholder="Search reviews…"
+      searchPlaceholder="Search by product, customer…"
       getRowLabel={(row) => row.product}
       statusFilter={{
         key: 'status',

@@ -280,7 +280,6 @@ export function BestSellers() {
   return (
     <ProductRail
       id="bestsellers"
-      eyebrow="Ready to gift"
       title="Best sellers"
       description="Loved pieces, packed with care."
       products={productRails.bestSellers}
@@ -359,7 +358,7 @@ export function ReviewsSection() {
           {reviews.map((review, i) => (
             <Reveal key={review.id} delay={i * 0.06}>
               <blockquote className="h-full rounded-2xl border border-hm-border bg-hm-elevated p-6">
-                <p className="text-xs font-medium text-hm-accent">
+                <p className="text-xs font-semibold text-hm-gold">
                   {'★'.repeat(review.rating || 5)}
                 </p>
                 <p className="mt-3 font-display text-xl leading-snug text-hm-text">

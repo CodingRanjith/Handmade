@@ -1,13 +1,12 @@
 import { createLocalStore } from '@/admin/lib/createLocalStore'
 
-const seed = [
+export const categorySeed = [
   {
     id: 'cat_1',
     name: 'Home Décor',
     slug: 'home-decor',
     description: 'Handcrafted pieces for living spaces',
-    sortOrder: 1,
-    status: 'active',
+    status: 'published',
     productCount: 0,
     imageUrl:
       'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
@@ -19,8 +18,7 @@ const seed = [
     name: 'Corporate Gifts',
     slug: 'corporate-gifts',
     description: 'Premium gifting for teams and clients',
-    sortOrder: 2,
-    status: 'active',
+    status: 'published',
     productCount: 0,
     imageUrl:
       'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=80',
@@ -32,8 +30,7 @@ const seed = [
     name: 'Personalized Gifts',
     slug: 'personalized-gifts',
     description: 'Custom monograms and keepsakes',
-    sortOrder: 3,
-    status: 'active',
+    status: 'published',
     productCount: 0,
     imageUrl:
       'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=1200&q=80',
@@ -45,8 +42,7 @@ const seed = [
     name: 'Jewellery',
     slug: 'jewellery',
     description: 'Artisan jewellery and accessories',
-    sortOrder: 4,
-    status: 'active',
+    status: 'published',
     productCount: 0,
     imageUrl:
       'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=80',
@@ -55,10 +51,41 @@ const seed = [
   },
 ]
 
-export const categoryStore = createLocalStore('hm_admin_categories_v1', seed, 'cat')
+export const categoryStore = createLocalStore('hm_admin_categories_v2', categorySeed, 'cat')
+
+export const categoryImportHeaders = [
+  { key: 'name', label: 'name' },
+  { key: 'slug', label: 'slug' },
+  { key: 'description', label: 'description' },
+  { key: 'status', label: 'status' },
+  { key: 'imageUrl', label: 'imageUrl' },
+]
+
+export const categoryImportSampleRows = [
+  {
+    name: 'Festive Hampers',
+    slug: 'festive-hampers',
+    description: 'Curated hampers for festive gifting.',
+    status: 'published',
+    imageUrl: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=1200&q=80',
+  },
+]
 
 export const listCategories = () => categoryStore.list()
 export const getCategoryById = (id) => categoryStore.getById(id)
 export const createCategory = (payload) => categoryStore.create(payload)
 export const updateCategory = (id, payload) => categoryStore.update(id, payload)
 export const deleteCategory = (id) => categoryStore.remove(id)
+
+export function bulkImportCategories(rows) {
+  return rows.map((row) =>
+    categoryStore.create({
+      name: row.name,
+      slug: row.slug,
+      description: row.description || '',
+      status: row.status || 'published',
+      productCount: 0,
+      imageUrl: row.imageUrl || '',
+    }),
+  )
+}

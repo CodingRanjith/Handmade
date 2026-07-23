@@ -8,7 +8,7 @@ import {
   Truck,
   Users,
 } from 'lucide-react'
-import { getStorefrontProducts } from '@/shared/catalog/liveCatalog'
+import { useStorefrontProducts } from '@/shared/catalog/useLiveCatalog'
 import { ProductCard } from '@/storefront/components/product/ProductCard'
 import { Button } from '@/shared/components/ui/Button'
 
@@ -75,8 +75,9 @@ const perks = [
 ]
 
 export function CorporateGiftsPage() {
-  const products = getStorefrontProducts().filter(
-    (p) => p.category === 'Corporate Gifts' || p.occasion.includes('Corporate'),
+  const allProducts = useStorefrontProducts()
+  const products = allProducts.filter(
+    (p) => p.category === 'Corporate Gifts' || (p.occasion || []).includes('Corporate'),
   )
 
   return (

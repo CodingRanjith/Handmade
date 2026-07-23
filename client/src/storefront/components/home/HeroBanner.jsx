@@ -10,7 +10,6 @@ const HERO_IMAGE =
 
 /**
  * FNP-style hero: horizontal rounded promo cards + occasion icon strip.
- * Content unchanged — same HandMade copy, CTAs, and trending collections.
  */
 export function HeroBanner() {
   const scrollerRef = useRef(null)
@@ -22,7 +21,7 @@ export function HeroBanner() {
   }
 
   return (
-    <section className="bg-hm-bg pb-2 pt-4 sm:pt-5">
+    <section className="pb-2 pt-4 sm:pt-5">
       <Container>
         <div className="relative">
           <button
@@ -46,10 +45,11 @@ export function HeroBanner() {
             ref={scrollerRef}
             className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-none"
           >
-            {/* Primary brand card — same content as before */}
-            <article className="relative flex min-h-[220px] w-[88%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border bg-hm-muted shadow-hm-card sm:min-h-[260px] sm:w-[70%] lg:w-[58%]">
+            <article className="relative flex min-h-[240px] w-[88%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border bg-gradient-to-br from-[#fff0ea] via-white to-[#e8f7f4] shadow-hm-elevated sm:min-h-[280px] sm:w-[70%] lg:w-[58%]">
+              <div className="pointer-events-none absolute -left-8 top-0 h-40 w-40 rounded-full bg-hm-accent/20 blur-3xl" />
+              <div className="pointer-events-none absolute bottom-0 right-1/3 h-32 w-32 rounded-full bg-hm-teal/20 blur-3xl" />
               <div className="relative z-10 flex w-full flex-col justify-center p-6 sm:max-w-[55%] sm:p-8 md:p-10">
-                <p className="font-display text-3xl leading-none tracking-tight text-hm-text sm:text-4xl md:text-5xl">
+                <p className="font-display text-4xl leading-none tracking-tight text-hm-primary sm:text-5xl md:text-6xl">
                   HandMade
                 </p>
                 <h1 className="mt-3 text-base font-semibold leading-snug text-hm-text sm:text-lg md:text-xl">
@@ -80,15 +80,14 @@ export function HeroBanner() {
                 className="absolute inset-y-0 right-0 hidden h-full w-[50%] object-cover sm:block"
                 fetchPriority="high"
               />
-              <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[50%] bg-gradient-to-r from-hm-muted to-transparent sm:block" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[50%] bg-gradient-to-r from-[#fff0ea] via-transparent to-transparent sm:block" />
             </article>
 
-            {/* Trending collection cards — same data */}
             {trendingCollections.map((item) => (
               <Link
                 key={item.id}
                 to={item.path}
-                className="group relative flex min-h-[220px] w-[78%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border shadow-hm-card sm:min-h-[260px] sm:w-[52%] lg:w-[38%]"
+                className="group relative flex min-h-[240px] w-[78%] shrink-0 snap-center overflow-hidden rounded-3xl border border-hm-border shadow-hm-card sm:min-h-[280px] sm:w-[52%] lg:w-[38%]"
               >
                 <img
                   src={item.image}
@@ -96,14 +95,14 @@ export function HeroBanner() {
                   className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-hm-primary/85 via-hm-accent/45 to-transparent" />
                 <div className="relative z-10 flex w-full flex-col justify-end p-6 sm:p-8">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/75">
                     Trending collections
                   </p>
                   <h2 className="mt-1 font-display text-3xl text-white sm:text-4xl">{item.title}</h2>
-                  <p className="mt-1 text-sm text-white/75">{item.subtitle}</p>
-                  <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-hm-elevated px-3.5 py-2 text-xs font-semibold text-hm-text">
+                  <p className="mt-1 text-sm text-white/80">{item.subtitle}</p>
+                  <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-semibold text-hm-primary">
                     Explore <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
@@ -112,24 +111,35 @@ export function HeroBanner() {
           </div>
         </div>
 
-        {/* Occasion shortcut strip — same occasion labels/paths */}
         <div className="mt-5 flex gap-4 overflow-x-auto pb-2 scrollbar-none sm:mt-6 sm:justify-center sm:gap-5">
-          {occasions.map((item) => (
-            <Link
-              key={item.id}
-              to={item.path}
-              className="group flex w-[72px] shrink-0 flex-col items-center gap-2 sm:w-[84px]"
-            >
-              <span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border border-hm-border bg-hm-elevated shadow-hm-soft transition group-hover:border-hm-accent sm:h-[84px] sm:w-[84px]">
-                <span className="font-display text-2xl text-hm-accent sm:text-3xl">
-                  {item.label.charAt(0)}
+          {occasions.map((item, index) => {
+            const tones = [
+              'from-[#ffd8cf] to-[#ffe9e3]',
+              'from-[#d8f3ee] to-[#eafaf7]',
+              'from-[#ffe8b8] to-[#fff4d8]',
+              'from-[#f3d6e2] to-[#fbeaf1]',
+              'from-[#dde9ff] to-[#eef3ff]',
+              'from-[#e4f5d8] to-[#f1fae8]',
+            ]
+            return (
+              <Link
+                key={item.id}
+                to={item.path}
+                className="group flex w-[72px] shrink-0 flex-col items-center gap-2 sm:w-[84px]"
+              >
+                <span
+                  className={`flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border border-hm-border bg-gradient-to-br ${tones[index % tones.length]} shadow-hm-soft transition duration-300 group-hover:-translate-y-1 group-hover:border-hm-accent sm:h-[84px] sm:w-[84px]`}
+                >
+                  <span className="font-display text-2xl text-hm-primary sm:text-3xl">
+                    {item.label.charAt(0)}
+                  </span>
                 </span>
-              </span>
-              <span className="text-center text-[11px] font-semibold leading-tight text-hm-text sm:text-xs">
-                {item.label}
-              </span>
-            </Link>
-          ))}
+                <span className="text-center text-[11px] font-semibold leading-tight text-hm-text sm:text-xs">
+                  {item.label}
+                </span>
+              </Link>
+            )
+          })}
         </div>
       </Container>
     </section>

@@ -10,6 +10,11 @@ function lineKey(product) {
 export function CartProvider({ children }) {
   const [items, setItems] = useState([])
   const [toast, setToast] = useState(null)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const openCart = useCallback(() => setIsOpen(true), [])
+  const closeCart = useCallback(() => setIsOpen(false), [])
+  const toggleCart = useCallback(() => setIsOpen((v) => !v), [])
 
   const showToast = useCallback((message) => {
     setToast(message)
@@ -18,7 +23,7 @@ export function CartProvider({ children }) {
   }, [])
 
   const addItem = useCallback(
-    (product, qty = 1) => {
+    (product, qty = 1, { open = true } = {}) => {
       const addQty = Number(qty) > 0 ? Number(qty) : product.qty || 1
       const key = lineKey(product)
 
@@ -44,6 +49,7 @@ export function CartProvider({ children }) {
         ]
       })
       showToast(`Added “${product.name}” to bag`)
+      if (open) setIsOpen(true)
     },
     [showToast],
   )
@@ -77,10 +83,27 @@ export function CartProvider({ children }) {
       removeItem,
       updateQty,
       clearCart,
+      isOpen,
+      openCart,
+      closeCart,
+      toggleCart,
       toast,
       clearToast: () => setToast(null),
     }),
-    [items, count, subtotal, addItem, removeItem, updateQty, clearCart, toast],
+    [
+      items,
+      count,
+      subtotal,
+      addItem,
+      removeItem,
+      updateQty,
+      clearCart,
+      isOpen,
+      openCart,
+      closeCart,
+      toggleCart,
+      toast,
+    ],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

@@ -13,8 +13,18 @@ import { Button } from '@/shared/components/ui/Button'
 import { Modal } from '@/shared/components/ui/Modal'
 import { Skeleton } from '@/shared/components/ui/Skeleton'
 import { Input, Select, Textarea, Checkbox } from '@/shared/components/forms/Field'
+import { ImageUploadField } from '@/shared/components/forms/ImageUploadField'
 import { statusTone } from '@/admin/lib/statusTone'
 import { cn } from '@/shared/utils/cn'
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
 
 /**
  * Generic admin CRUD list page with modal create/edit.
@@ -35,6 +45,7 @@ import { cn } from '@/shared/utils/cn'
  * @param {{ key: string, label: string, options: {value:string,label:string}[] } | null} [props.statusFilter]
  * @param {(row: object) => string} [props.getRowLabel]
  * @param {boolean} [props.readOnly]
+ * @param {import('react').ReactNode} [props.headerActions]
  */
 export function AdminCrudPage({
   title,
@@ -52,6 +63,7 @@ export function AdminCrudPage({
   statusFilter = null,
   getRowLabel = (row) => row.name || row.title || row.code || row.id,
   readOnly = false,
+  headerActions = null,
 }) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [filterValue, setFilterValue] = useState('all')
@@ -127,7 +139,15 @@ export function AdminCrudPage({
   }
 
   function setField(name, value) {
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => {
+      const next = { ...prev, [name]: value }
+      const slugField = fields.find((f) => f.autoFrom === name)
+      // Auto-fill slug from source field on create (or when editing a row with no slug yet)
+      if (slugField && !editing?.slug) {
+        next[slugField.name] = slugify(value)
+      }
+      return next
+    })
   }
 
   async function handleSave(e) {
@@ -167,14 +187,19 @@ export function AdminCrudPage({
           <h2 className="text-xl font-semibold tracking-tight text-admin-text sm:text-2xl">
             {title}
           </h2>
-          <p className="mt-1 text-sm text-admin-text-muted">{description}</p>
+          {description ? (
+            <p className="mt-1 text-sm text-admin-text-muted">{description}</p>
+          ) : null}
         </div>
-        {!readOnly ? (
-          <Button variant="accent" size="sm" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            {addLabel}
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {headerActions}
+          {!readOnly ? (
+            <Button variant="accent" size="sm" onClick={openCreate}>
+              <Plus className="h-4 w-4" />
+              {addLabel}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-admin-border bg-admin-elevated p-4 shadow-admin sm:flex-row sm:items-center">
@@ -333,6 +358,17 @@ export function AdminCrudPage({
                     label={field.label}
                     checked={Boolean(form[field.name])}
                     onChange={(e) => setField(field.name, e.target.checked)}
+                  />
+                )
+              }
+              if (field.type === 'image') {
+                return (
+                  <ImageUploadField
+                    key={field.name}
+                    label={field.label}
+                    value={form[field.name] ?? ''}
+                    onChange={(next) => setField(field.name, next)}
+                    accept={field.accept}
                   />
                 )
               }

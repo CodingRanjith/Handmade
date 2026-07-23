@@ -1,5 +1,7 @@
+import { Navigate, useParams } from 'react-router-dom'
 import { ModulePlaceholderPage } from '@/storefront/pages/ModulePlaceholderPage'
 import { sitemap } from '@/storefront/config/sitemap'
+import { useStorefrontCategories } from '@/shared/catalog/useLiveCatalog'
 
 function hubLinks(moduleId) {
   const mod = sitemap.find((m) => m.id === moduleId)
@@ -163,14 +165,22 @@ export function DiscoverHubPage() {
 }
 
 export function CategorySlugPage() {
-  return (
-    <ModulePlaceholderPage
-      title="Category Collection"
-      eyebrow="Catalog"
-      description="Category-wise grids with filters, sort, quick view, wishlist, and compare are next."
-      nextModule="Category — Product Grid + Filters"
-    />
+  const { slug } = useParams()
+  const categories = useStorefrontCategories()
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase()
+  const cat = categories.find(
+    (c) =>
+      String(c.slug || '').toLowerCase() === key ||
+      String(c.name || '')
+        .toLowerCase()
+        .replace(/\s+/g, '-') === key,
   )
+  if (cat) {
+    return <Navigate to={`/categories?category=${encodeURIComponent(cat.name)}`} replace />
+  }
+  return <Navigate to="/categories" replace />
 }
 
 export function SearchPage() {

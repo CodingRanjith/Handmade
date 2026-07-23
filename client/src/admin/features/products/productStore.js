@@ -1,3 +1,14 @@
+import {
+  generateSku,
+  normalizeCategories,
+  productDefaults,
+  slugify,
+} from '@/admin/features/products/productSchema'
+import {
+  averageRating,
+  createStaticReviewsForProduct,
+} from '@/admin/features/reviews/reviewStore'
+
 const STORAGE_KEY = 'hm_admin_products_v1'
 
 const seedProducts = [
@@ -17,7 +28,7 @@ const seedProducts = [
     stock: 42,
     lowStockAt: 10,
     weightGrams: 850,
-    status: 'active',
+    status: 'published',
     featured: true,
     trending: true,
     seoTitle: 'Walnut Serving Tray | HandMade',
@@ -42,7 +53,7 @@ const seedProducts = [
     stock: 3,
     lowStockAt: 8,
     weightGrams: 620,
-    status: 'active',
+    status: 'published',
     featured: false,
     trending: true,
     seoTitle: 'Brass Candle Set | HandMade',
@@ -67,7 +78,7 @@ const seedProducts = [
     stock: 120,
     lowStockAt: 20,
     weightGrams: 180,
-    status: 'active',
+    status: 'published',
     featured: true,
     trending: false,
     seoTitle: 'Linen Gift Wrap Kit',
@@ -92,7 +103,7 @@ const seedProducts = [
     stock: 28,
     lowStockAt: 12,
     weightGrams: 2100,
-    status: 'active',
+    status: 'published',
     featured: true,
     trending: true,
     seoTitle: 'Corporate Welcome Hamper | HandMade',
@@ -192,6 +203,29 @@ export function createProduct(payload) {
     updatedAt: now,
   }
   writeStore([product, ...products])
+
+  const seededReviews = createStaticReviewsForProduct(product)
+  if (seededReviews.length > 0) {
+    const autoRating = averageRating(seededReviews)
+    const needsRating = product.rating === '' || product.rating == null
+    const needsCount = !product.reviewCount
+    if (needsRating || needsCount) {
+      const patched = {
+        ...product,
+        rating: needsRating ? autoRating : product.rating,
+        reviewCount: needsCount ? seededReviews.length : product.reviewCount,
+        updatedAt: new Date().toISOString(),
+      }
+      const next = readStore()
+      const idx = next.findIndex((p) => p.id === product.id)
+      if (idx !== -1) {
+        next[idx] = patched
+        writeStore(next)
+        return patched
+      }
+    }
+  }
+
   return product
 }
 
@@ -219,4 +253,139 @@ export function deleteProduct(id) {
 export function resetProducts() {
   writeStore(seedProducts)
   return [...seedProducts]
+}
+
+export const productImportHeaders = [
+  { key: 'name', label: 'name' },
+  { key: 'slug', label: 'slug' },
+  { key: 'sku', label: 'sku' },
+  { key: 'categories', label: 'categories' },
+  { key: 'brand', label: 'brand' },
+  { key: 'description', label: 'description' },
+  { key: 'instruction', label: 'instruction' },
+  { key: 'rating', label: 'rating' },
+  { key: 'reviewCount', label: 'reviewCount' },
+  { key: 'deliveryDaysProduct', label: 'deliveryDaysProduct' },
+  { key: 'deliveryDaysCustomized', label: 'deliveryDaysCustomized' },
+  { key: 'price', label: 'price' },
+  { key: 'compareAtPrice', label: 'compareAtPrice' },
+  { key: 'customizationEnabled', label: 'customizationEnabled' },
+  { key: 'customizedPrice', label: 'customizedPrice' },
+  { key: 'customizedMarketAtPrice', label: 'customizedMarketAtPrice' },
+  { key: 'minOrderQty', label: 'minOrderQty' },
+  { key: 'stock', label: 'stock' },
+  { key: 'weightGrams', label: 'weightGrams' },
+  { key: 'productCost', label: 'productCost' },
+  { key: 'serviceCost', label: 'serviceCost' },
+  { key: 'status', label: 'status' },
+  { key: 'featured', label: 'featured' },
+  { key: 'trending', label: 'trending' },
+  { key: 'seoTitle', label: 'seoTitle' },
+  { key: 'seoDescription', label: 'seoDescription' },
+  { key: 'imageUrl', label: 'imageUrl' },
+  { key: 'galleryImages', label: 'galleryImages' },
+]
+
+export const productImportSampleRows = [
+  {
+    name: 'Engraved Keepsake Frame',
+    slug: 'engraved-keepsake-frame',
+    sku: 'EK-101',
+    categories: 'Personalized Gifts|Home Décor',
+    brand: 'HandMade Atelier',
+    description: 'Wooden keepsake frame with custom engraving for gifting.',
+    instruction: 'Share engraving text after placing the order.',
+    rating: 4.8,
+    reviewCount: 12,
+    deliveryDaysProduct: 3,
+    deliveryDaysCustomized: 7,
+    price: 1490,
+    compareAtPrice: 1790,
+    customizationEnabled: 'true',
+    customizedPrice: 1690,
+    customizedMarketAtPrice: 1990,
+    minOrderQty: 1,
+    stock: 25,
+    weightGrams: 520,
+    productCost: 650,
+    serviceCost: 140,
+    status: 'published',
+    featured: 'true',
+    trending: 'false',
+    seoTitle: 'Engraved Keepsake Frame | HandMade',
+    seoDescription: 'Personalized engraved gift frame for memorable gifting.',
+    imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&q=80',
+  },
+]
+
+function parseNumber(value, fallback = '') {
+  if (value === '' || value == null) return fallback
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
+
+function parseBool(value, fallback = false) {
+  if (typeof value === 'boolean') return value
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+  if (normalized === 'true' || normalized === 'yes' || normalized === '1') return true
+  if (normalized === 'false' || normalized === 'no' || normalized === '0') return false
+  return fallback
+}
+
+export function bulkImportProducts(rows) {
+  return rows.map((row) => {
+    const categories = String(row.categories || '')
+      .split('|')
+      .map((value) => value.trim())
+      .filter(Boolean)
+    const normalizedCategories = normalizeCategories({
+      categories,
+      category: row.category,
+    })
+    return createProduct({
+      ...productDefaults,
+      name: row.name,
+      slug: row.slug || slugify(row.name),
+      sku: row.sku || generateSku(row.name),
+      categories: normalizedCategories,
+      category: normalizedCategories[0] || '',
+      brand: row.brand || '',
+      description: row.description || '',
+      instruction: row.instruction || '',
+      rating: parseNumber(row.rating),
+      reviewCount: parseNumber(row.reviewCount, 0),
+      deliveryDaysProduct: parseNumber(row.deliveryDaysProduct, productDefaults.deliveryDaysProduct),
+      deliveryDaysCustomized: parseNumber(
+        row.deliveryDaysCustomized,
+        productDefaults.deliveryDaysCustomized,
+      ),
+      price: parseNumber(row.price, 0),
+      compareAtPrice: parseNumber(row.compareAtPrice),
+      customizationEnabled: parseBool(
+        row.customizationEnabled,
+        Boolean(parseNumber(row.customizedPrice)),
+      ),
+      customizedPrice: parseNumber(row.customizedPrice),
+      customizedMarketAtPrice: parseNumber(row.customizedMarketAtPrice),
+      minOrderQty: parseNumber(row.minOrderQty, productDefaults.minOrderQty),
+      stock: parseNumber(row.stock, productDefaults.stock),
+      weightGrams: parseNumber(row.weightGrams),
+      productCost: parseNumber(row.productCost),
+      serviceCost: parseNumber(row.serviceCost),
+      cost: parseNumber(row.productCost),
+      status: row.status || productDefaults.status,
+      featured: parseBool(row.featured),
+      trending: parseBool(row.trending),
+      seoTitle: row.seoTitle || '',
+      seoDescription: row.seoDescription || '',
+      imageUrl: row.imageUrl || '',
+      galleryImages: String(row.galleryImages || '')
+        .split('|')
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 3),
+    })
+  })
 }

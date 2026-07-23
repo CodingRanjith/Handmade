@@ -2,10 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import {
   Bell,
-  Building2,
-  ChevronDown,
   Heart,
-  MapPin,
   Menu,
   Moon,
   Search,
@@ -23,7 +20,7 @@ import { cn } from '@/shared/utils/cn'
 
 export function StorefrontHeader() {
   const { toggleTheme, isDark } = useTheme()
-  const { count } = useCart()
+  const { count, openCart } = useCart()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -35,9 +32,9 @@ export function StorefrontHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hm-border bg-hm-elevated shadow-hm-soft">
+    <header className="sticky top-0 z-40 border-b border-hm-border/80 bg-hm-elevated/90 shadow-hm-soft backdrop-blur-xl">
       {/* Top announcement bar */}
-      <div className="bg-hm-primary text-hm-bg-elevated">
+      <div className="bg-gradient-to-r from-hm-primary via-[#9a2748] to-hm-accent text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-1.5 text-center text-[11px] font-medium tracking-wide sm:text-xs">
           <Truck className="hidden h-3.5 w-3.5 shrink-0 sm:block" />
           <span>India&apos;s most premium gifting experience — curated delivery nationwide</span>
@@ -56,24 +53,10 @@ export function StorefrontHeader() {
         </button>
 
         <Link to="/" className="shrink-0">
-          <span className="font-display text-2xl tracking-tight text-hm-text sm:text-3xl">
+          <span className="font-display text-2xl tracking-tight text-hm-primary sm:text-3xl">
             HandMade
           </span>
         </Link>
-
-        <button
-          type="button"
-          className="hidden max-w-[140px] items-center gap-1.5 rounded-lg border border-hm-border px-2.5 py-2 text-left hover:border-hm-accent md:flex"
-        >
-          <MapPin className="h-4 w-4 shrink-0 text-hm-accent" />
-          <span className="min-w-0">
-            <span className="block text-[10px] text-hm-text-subtle">Where to deliver?</span>
-            <span className="flex items-center gap-0.5 text-xs font-semibold text-hm-text">
-              Select city
-              <ChevronDown className="h-3.5 w-3.5 text-hm-text-muted" />
-            </span>
-          </span>
-        </button>
 
         <form onSubmit={onSearch} className="relative hidden min-w-0 flex-1 sm:block">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-hm-text-subtle" />
@@ -82,7 +65,7 @@ export function StorefrontHeader() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search gifts, occasions, surprises..."
-            className="h-11 w-full rounded-xl border border-hm-border bg-hm-bg pl-10 pr-4 text-sm text-hm-text outline-none transition placeholder:text-hm-text-subtle focus:border-hm-accent focus:ring-2 focus:ring-hm-ring"
+            className="h-11 w-full rounded-xl border border-hm-border bg-white/80 pl-10 pr-4 text-sm text-hm-text outline-none transition placeholder:text-hm-text-subtle focus:border-hm-accent focus:ring-2 focus:ring-hm-ring"
             aria-label="Search"
           />
         </form>
@@ -90,17 +73,10 @@ export function StorefrontHeader() {
         <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
           <Link
             to="/reminders"
-            className="hidden items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-hm-text-muted hover:bg-hm-muted hover:text-hm-text xl:flex"
+            className="rounded-lg p-2 text-hm-text hover:bg-hm-muted"
+            aria-label="Notifications"
           >
-            <Bell className="h-4 w-4" />
-            My Reminders
-          </Link>
-          <Link
-            to="/corporate"
-            className="hidden items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-hm-text-muted hover:bg-hm-muted hover:text-hm-text lg:flex"
-          >
-            <Building2 className="h-4 w-4" />
-            Corporate
+            <Bell className="h-5 w-5" />
           </Link>
           <Link to="/search" className="rounded-lg p-2 text-hm-text hover:bg-hm-muted sm:hidden">
             <Search className="h-5 w-5" />
@@ -108,20 +84,25 @@ export function StorefrontHeader() {
           <Link to="/wishlist" className="rounded-lg p-2 text-hm-text hover:bg-hm-muted" aria-label="Wishlist">
             <Heart className="h-5 w-5" />
           </Link>
-          <Link to="/cart" className="relative rounded-lg p-2 text-hm-text hover:bg-hm-muted" aria-label="Cart">
+          <button
+            type="button"
+            onClick={openCart}
+            className="relative rounded-lg p-2 text-hm-text hover:bg-hm-muted"
+            aria-label="Cart"
+          >
             <ShoppingBag className="h-5 w-5" />
             {count > 0 ? (
               <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-hm-accent px-1 text-[10px] font-bold text-hm-primary">
                 {count}
               </span>
             ) : null}
-          </Link>
+          </button>
           <Link
             to="/account"
-            className="hidden items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-hm-text-muted hover:bg-hm-muted hover:text-hm-text sm:flex"
+            className="rounded-lg p-2 text-hm-text hover:bg-hm-muted"
+            aria-label="Account"
           >
-            <User className="h-4 w-4" />
-            <span className="hidden md:inline">Account</span>
+            <User className="h-5 w-5" />
           </Link>
           <Button
             variant="ghost"
@@ -147,8 +128,8 @@ export function StorefrontHeader() {
               to={item.path}
               className={({ isActive }) =>
                 cn(
-                  'shrink-0 border-b-2 border-transparent px-3 py-3 text-[13px] font-semibold tracking-wide text-hm-text-muted transition hover:text-hm-text',
-                  isActive && 'border-hm-accent text-hm-text',
+                  'shrink-0 border-b-2 border-transparent px-3 py-3 text-[13px] font-semibold tracking-wide text-hm-text-muted transition hover:text-hm-primary',
+                  isActive && 'border-hm-accent text-hm-primary',
                 )
               }
             >
@@ -189,12 +170,16 @@ export function StorefrontHeader() {
                   {item.label}
                 </Link>
               ))}
-              <Link to="/corporate" onClick={() => setOpen(false)} className="text-lg text-hm-text">
-                Corporate
-              </Link>
-              <Link to="/cart" onClick={() => setOpen(false)} className="text-lg text-hm-text">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false)
+                  openCart()
+                }}
+                className="text-left text-lg text-hm-text"
+              >
                 Bag ({count})
-              </Link>
+              </button>
               <Link to="/login" onClick={() => setOpen(false)} className="text-lg text-hm-text">
                 Sign in
               </Link>

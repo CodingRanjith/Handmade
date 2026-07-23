@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { formatCurrency } from '@/shared/lib/utils'
 import { useCart } from '@/storefront/hooks/useCart'
+import { StarRating } from '@/storefront/components/product/StarRating'
 import { cn } from '@/shared/utils/cn'
 
 /** Simple product card — no 3D / heavy motion */
@@ -20,12 +21,19 @@ export function ProductCard({ product, className }) {
     e.preventDefault()
     e.stopPropagation()
     addItem({ ...product, image, price: product.price })
-    navigate('/cart')
   }
 
   return (
-    <article className={cn('group overflow-hidden rounded-2xl border border-hm-border bg-hm-elevated', className)}>
-      <Link to={`/products/${product.id}`} className="relative block aspect-[4/5] overflow-hidden bg-hm-muted">
+    <article
+      className={cn(
+        'group flex h-full flex-col overflow-hidden rounded-2xl border border-hm-border bg-hm-elevated text-[1.05rem] shadow-hm-soft transition duration-300 hover:-translate-y-1 hover:border-hm-accent/40 hover:shadow-hm-card',
+        className,
+      )}
+    >
+      <Link
+        to={`/products/${product.id}`}
+        className="relative block aspect-[5/4] shrink-0 overflow-hidden bg-gradient-to-br from-hm-muted to-white"
+      >
         <img
           src={image}
           alt={product.name}
@@ -33,14 +41,14 @@ export function ProductCard({ product, className }) {
           className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
         />
         {product.tag ? (
-          <span className="absolute left-3 top-3 rounded-full bg-hm-elevated/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-hm-text">
+          <span className="absolute left-3.5 top-3.5 rounded-xl bg-hm-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
             {product.tag}
           </span>
         ) : null}
         <button
           type="button"
           aria-label="Wishlist"
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-hm-elevated/95 text-hm-text"
+          className="absolute right-3.5 top-3.5 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-hm-primary shadow-hm-soft"
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -51,48 +59,73 @@ export function ProductCard({ product, className }) {
         </button>
       </Link>
 
-      <div className="space-y-3 p-4">
-        <div>
+      <div className="flex flex-1 flex-col p-5">
+        <div className="min-h-[4.25rem]">
           <Link to={`/products/${product.id}`}>
-            <h3 className="text-base font-medium text-hm-text hover:text-hm-accent">{product.name}</h3>
+            <h3 className="line-clamp-2 min-h-[2.75rem] text-[1.05rem] font-medium leading-snug text-hm-text hover:text-hm-primary">
+              {product.name}
+            </h3>
           </Link>
-          <p className="mt-0.5 text-xs text-hm-text-subtle">
-            {typeof product.occasion === 'string'
-              ? product.occasion
-              : product.occasion?.[0] || 'Ready to gift'}
-          </p>
-        </div>
-
-        <div className="flex items-end justify-between gap-2">
-          <div>
-            <p className="text-lg font-semibold text-hm-text">{formatCurrency(product.price)}</p>
-            {product.compareAt ? (
-              <p className="text-xs text-hm-text-subtle line-through">
-                {formatCurrency(product.compareAt)}
-              </p>
-            ) : null}
-          </div>
-          {product.rating ? (
-            <p className="text-xs font-medium text-hm-accent">★ {product.rating}</p>
+          {(typeof product.occasion === 'string'
+            ? product.occasion
+            : product.occasion?.[0]) || product.category ? (
+            <p className="mt-1 line-clamp-1 text-[0.8125rem] text-hm-text-subtle">
+              {typeof product.occasion === 'string'
+                ? product.occasion
+                : product.occasion?.[0] || product.category}
+            </p>
           ) : null}
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-hm-border text-xs font-semibold text-hm-text hover:border-hm-accent"
-          >
-            <ShoppingBag className="h-3.5 w-3.5" />
-            Add
-          </button>
-          <button
-            type="button"
-            onClick={handleBuy}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-hm-primary text-xs font-semibold text-hm-bg-elevated hover:bg-hm-primary-hover"
-          >
-            Buy now
-          </button>
+        <div className="mt-auto pt-3">
+          <div className="flex min-h-[2.75rem] items-end justify-between gap-2">
+            <div>
+              <div className="flex flex-wrap items-baseline gap-2">
+                <p className="text-xl font-semibold leading-tight text-hm-primary">
+                  {formatCurrency(product.price)}
+                </p>
+                {product.offerPercent > 0 ||
+                (product.compareAt && product.compareAt > product.price) ? (
+                  <span className="rounded-md bg-hm-offer-muted px-1.5 py-0.5 text-[0.75rem] font-semibold text-hm-offer">
+                    {product.offerPercent > 0
+                      ? `${product.offerPercent}% off`
+                      : `${Math.round(((product.compareAt - product.price) / product.compareAt) * 1000) / 10}% off`}
+                  </span>
+                ) : null}
+              </div>
+              <p
+                className={cn(
+                  'text-[0.8125rem] leading-tight text-hm-text-subtle line-through',
+                  !product.compareAt && 'invisible',
+                )}
+              >
+                {product.compareAt ? formatCurrency(product.compareAt) : '—'}
+              </p>
+            </div>
+            <div
+              className={cn(!product.rating && 'invisible')}
+            >
+              <StarRating rating={product.rating || 0} />
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={handleAdd}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl border border-hm-border text-[0.8125rem] font-semibold text-hm-text hover:border-hm-accent hover:text-hm-primary"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              Add
+            </button>
+            <button
+              type="button"
+              onClick={handleBuy}
+              className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-hm-primary text-[0.8125rem] font-semibold text-white hover:bg-hm-primary-hover"
+            >
+              Buy now
+            </button>
+          </div>
         </div>
       </div>
     </article>

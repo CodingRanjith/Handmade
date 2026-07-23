@@ -12,7 +12,8 @@ export function createLocalStore(storageKey, seed, idPrefix = 'row') {
         localStorage.setItem(storageKey, JSON.stringify(seed))
         return [...seed]
       }
-      return JSON.parse(raw)
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed : [...seed]
     } catch {
       return [...seed]
     }

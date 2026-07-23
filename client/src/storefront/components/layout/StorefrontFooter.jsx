@@ -40,23 +40,28 @@ const footerColumns = [
 
 export function StorefrontFooter() {
   return (
-    <footer id="footer" className="border-t border-hm-border bg-hm-muted/40">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-5">
+    <footer
+      id="footer"
+      className="relative mt-10 overflow-hidden border-t border-hm-border bg-gradient-to-br from-hm-primary via-[#8f2448] to-[#c44536] text-white"
+    >
+      <div className="pointer-events-none absolute -right-16 top-0 h-56 w-56 rounded-full bg-hm-teal/25 blur-3xl" />
+      <div className="pointer-events-none absolute -left-10 bottom-0 h-48 w-48 rounded-full bg-hm-gold/20 blur-3xl" />
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-5">
         <div className="md:col-span-1">
-          <p className="font-display text-3xl text-hm-text">HandMade</p>
-          <p className="mt-3 text-sm leading-relaxed text-hm-text-muted">
+          <p className="font-display text-3xl text-white">HandMade</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/75">
             India&apos;s premium gifting experience — personalized, corporate, and surprise.
           </p>
         </div>
         {footerColumns.map((col) => (
           <div key={col.title}>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-hm-text-subtle">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/55">
               {col.title}
             </p>
             <ul className="mt-4 space-y-2.5">
               {col.links.map((item) => (
                 <li key={item.path}>
-                  <Link to={item.path} className="text-sm text-hm-text-muted hover:text-hm-text">
+                  <Link to={item.path} className="text-sm text-white/80 hover:text-white">
                     {item.label}
                   </Link>
                 </li>
@@ -65,7 +70,7 @@ export function StorefrontFooter() {
           </div>
         ))}
       </div>
-      <div className="border-t border-hm-border px-5 py-5 text-center text-xs text-hm-text-subtle sm:px-8">
+      <div className="relative border-t border-white/15 px-5 py-5 text-center text-xs text-white/60 sm:px-8">
         © {new Date().getFullYear()} HandMade · Crafted for memorable moments
       </div>
     </footer>

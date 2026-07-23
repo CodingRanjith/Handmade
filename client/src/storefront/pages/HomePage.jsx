@@ -1,4 +1,5 @@
 import { HeroBanner } from '@/storefront/components/home/HeroBanner'
+import { HomeEnquiryPopup } from '@/storefront/components/home/HomeEnquiryPopup'
 import {
   BestSellers,
   BlogsSection,
@@ -40,6 +41,7 @@ export function HomePage() {
       <BlogsSection />
       <GiftIdeasStrip />
       <NewsletterBand />
+      <HomeEnquiryPopup />
     </>
   )
 }
