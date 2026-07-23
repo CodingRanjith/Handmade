@@ -132,7 +132,7 @@ export function CartDrawer() {
                       <div className="inline-flex items-center rounded-lg border border-hm-border bg-hm-elevated">
                         <button
                           type="button"
-                          className="px-2 py-1.5"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center"
                           onClick={() => updateQty(item.key, item.qty - 1)}
                           aria-label="Decrease quantity"
                         >
@@ -141,7 +141,7 @@ export function CartDrawer() {
                         <span className="min-w-7 text-center text-sm font-semibold">{item.qty}</span>
                         <button
                           type="button"
-                          className="px-2 py-1.5"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center"
                           onClick={() => updateQty(item.key, item.qty + 1)}
                           aria-label="Increase quantity"
                         >
@@ -154,7 +154,7 @@ export function CartDrawer() {
                           type="button"
                           onClick={() => removeItem(item.key)}
                           aria-label="Remove"
-                          className="rounded-md p-1 text-hm-text-muted hover:text-hm-danger"
+                          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-hm-text-muted hover:text-hm-danger"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -168,7 +168,7 @@ export function CartDrawer() {
         </div>
 
         {count ? (
-          <div className="border-t border-hm-border px-5 py-4">
+          <div className="border-t border-hm-border px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between">
               <p className="text-sm text-hm-text-muted">Subtotal</p>
               <p className="text-lg font-semibold text-hm-text">{formatCurrency(subtotal)}</p>

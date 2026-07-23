@@ -77,17 +77,17 @@ export function CustomizeProductModal({
         className="absolute inset-0 bg-black/55"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-t-3xl bg-white shadow-hm-elevated sm:rounded-3xl">
+      <div className="relative z-10 flex max-h-[min(92svh,640px)] w-full max-w-md flex-col overflow-hidden rounded-t-3xl bg-hm-elevated shadow-hm-elevated sm:rounded-3xl">
         <button
           type="button"
           onClick={onClose}
-          className="absolute left-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white text-hm-text shadow-hm-soft"
+          className="absolute left-3 top-3 z-20 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-hm-elevated text-hm-text shadow-hm-soft"
           aria-label="Close customize"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="px-5 pb-5 pt-12">
+        <div className="overflow-y-auto px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-12">
           <h2 className="text-center text-xl font-bold text-hm-text">Customize Product</h2>
           {productName ? (
             <p className="mt-1 text-center text-xs text-hm-text-muted">{productName}</p>
@@ -98,7 +98,7 @@ export function CustomizeProductModal({
               type="button"
               onClick={() => setTab('photos')}
               className={cn(
-                'flex-1 pb-2.5 text-sm font-semibold',
+                'min-h-11 flex-1 pb-2.5 text-sm font-semibold',
                 tab === 'photos'
                   ? 'border-b-2 border-hm-primary text-hm-primary'
                   : 'text-hm-text-muted',
@@ -110,7 +110,7 @@ export function CustomizeProductModal({
               type="button"
               onClick={() => setTab('text')}
               className={cn(
-                'flex-1 pb-2.5 text-sm font-semibold',
+                'min-h-11 flex-1 pb-2.5 text-sm font-semibold',
                 tab === 'text'
                   ? 'border-b-2 border-hm-primary text-hm-primary'
                   : 'text-hm-text-muted',
@@ -120,7 +120,7 @@ export function CustomizeProductModal({
             </button>
           </div>
 
-          <div className="mt-5 min-h-[280px]">
+          <div className="mt-5 min-h-[200px] sm:min-h-[280px]">
             {tab === 'photos' ? (
               <div className="space-y-4">
                 <input
@@ -136,7 +136,7 @@ export function CustomizeProductModal({
                 <button
                   type="button"
                   onClick={() => inputRef.current?.click()}
-                  className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed border-hm-border bg-hm-muted/50"
+                  className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed border-hm-border bg-hm-muted/50 sm:h-48"
                 >
                   {photoDataUrl ? (
                     <img src={photoDataUrl} alt="" className="h-full w-full object-cover" />
@@ -168,7 +168,7 @@ export function CustomizeProductModal({
                   <textarea
                     value={customText}
                     onChange={(e) => setCustomText(e.target.value)}
-                    rows={6}
+                    rows={5}
                     placeholder="Enter name, message, or engraving text…"
                     className="w-full rounded-xl border border-hm-border bg-hm-bg px-3 py-2.5 text-sm text-hm-text outline-none focus:border-hm-accent focus:ring-2 focus:ring-hm-ring"
                   />

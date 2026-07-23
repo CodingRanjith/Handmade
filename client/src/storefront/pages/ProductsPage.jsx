@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Filter, Search, SlidersHorizontal, X } from 'lucide-react'
 import { ProductCard } from '@/storefront/components/product/ProductCard'
@@ -15,6 +15,15 @@ export function ProductsPage() {
   const [mobileFilters, setMobileFilters] = useState(false)
   const categories = useStorefrontCategories()
   const allProducts = useStorefrontProducts()
+
+  useEffect(() => {
+    if (!mobileFilters) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileFilters])
 
   const state = {
     search: params.get('q') || '',
@@ -183,9 +192,9 @@ export function ProductsPage() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-[90rem] gap-8 px-5 pb-16 sm:px-8 lg:grid-cols-[240px_1fr]">
+      <div className="mx-auto grid max-w-[90rem] gap-6 px-4 pb-16 sm:gap-8 sm:px-8 lg:grid-cols-[240px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-28 rounded-2xl border border-hm-border bg-hm-elevated p-5">
+          <div className="sticky top-[var(--hm-header-offset)] rounded-2xl border border-hm-border bg-hm-elevated p-5">
             <div className="mb-4 flex items-center gap-2 text-[0.9375rem] font-semibold text-hm-text">
               <Filter className="h-4 w-4 text-hm-accent" />
               Filters
@@ -201,7 +210,7 @@ export function ProductsPage() {
             {categoryFilter !== 'All' ? <span> in {categoryFilter}</span> : null}
           </p>
           {products.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-hm-border bg-hm-elevated/50 p-12 text-center">
+            <div className="rounded-2xl border border-dashed border-hm-border bg-hm-elevated/50 p-8 text-center sm:p-12">
               <p className="font-display text-2xl text-hm-text">
                 {categoryFilter !== 'All' ? `No active gifts in ${categoryFilter}` : 'No gifts match'}
               </p>
@@ -220,7 +229,7 @@ export function ProductsPage() {
               </div>
             </div>
           ) : (
-            <div className="grid auto-rows-fr grid-cols-2 gap-5 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 xl:grid-cols-4">
               {products.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -245,10 +254,15 @@ export function ProductsPage() {
             aria-label="Close"
             onClick={() => setMobileFilters(false)}
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[80svh] overflow-y-auto rounded-t-3xl border border-hm-border bg-hm-elevated p-5">
+          <div className="absolute inset-x-0 bottom-0 max-h-[85svh] overflow-y-auto rounded-t-3xl border border-hm-border bg-hm-elevated p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
             <div className="mb-4 flex items-center justify-between">
               <p className="font-semibold text-hm-text">Filters</p>
-              <button type="button" onClick={() => setMobileFilters(false)} aria-label="Close">
+              <button
+                type="button"
+                onClick={() => setMobileFilters(false)}
+                aria-label="Close"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-hm-muted"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>

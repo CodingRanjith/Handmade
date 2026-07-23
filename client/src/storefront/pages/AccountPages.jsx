@@ -55,7 +55,7 @@ export function AccountOrdersPage() {
   ]
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-hm-border bg-hm-elevated">
+    <div className="overflow-x-auto rounded-2xl border border-hm-border bg-hm-elevated">
       <table className="w-full min-w-[520px] text-left text-sm">
         <thead className="border-b border-hm-border bg-hm-muted/40 text-xs uppercase tracking-wider text-hm-text-muted">
           <tr>

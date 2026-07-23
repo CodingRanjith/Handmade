@@ -64,7 +64,16 @@
   --admin-sidebar-collapsed: 80px;
   --admin-header-height: 64px;
 
+  /* Sticky header clearance (announcement + utility; + nav on lg) */
+  --hm-header-offset: 5.5rem;
+
   color-scheme: light;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --hm-header-offset: 8.75rem;
+  }
 }
 
 .dark {
@@ -191,11 +200,15 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--hm-header-offset);
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
   min-height: 100svh;
+  max-width: 100%;
+  overflow-x: clip;
   font-family: var(--hm-font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -203,10 +216,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--hm-bg);
   color: var(--hm-text);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 #root {
   min-height: 100svh;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 /* Soft colorful atmosphere behind the shop */

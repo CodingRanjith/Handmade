@@ -132,7 +132,7 @@ export function HomeEnquiryPopup() {
         <button
           type="button"
           onClick={reopen}
-          className="fixed bottom-5 right-5 z-[70] inline-flex items-center gap-2 rounded-full bg-hm-primary px-4 py-3 text-sm font-semibold text-white shadow-hm-elevated hover:bg-hm-primary-hover"
+          className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-[max(1.25rem,env(safe-area-inset-right))] z-[70] inline-flex min-h-11 items-center gap-2 rounded-full bg-hm-primary px-4 py-3 text-sm font-semibold text-white shadow-hm-elevated hover:bg-hm-primary-hover"
           aria-label="Open enquiry form"
         >
           <MessageCircle className="h-4 w-4" />
@@ -153,9 +153,9 @@ export function HomeEnquiryPopup() {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Enquiry form"
-                className="relative z-10 w-full max-w-md overflow-hidden rounded-t-3xl border border-hm-border bg-hm-elevated shadow-hm-elevated sm:rounded-3xl"
+                className="relative z-10 flex max-h-[min(92svh,640px)] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-hm-border bg-hm-elevated shadow-hm-elevated sm:rounded-3xl"
               >
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#fff0ea] via-hm-elevated to-[#e8f7f4] px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+                <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-[#fff0ea] via-hm-elevated to-[#e8f7f4] px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
                   <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-hm-accent/20 blur-2xl" />
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -172,7 +172,7 @@ export function HomeEnquiryPopup() {
                     <button
                       type="button"
                       onClick={dismiss}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-hm-border bg-hm-elevated text-hm-text-muted hover:text-hm-text"
+                      className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-hm-border bg-hm-elevated text-hm-text-muted hover:text-hm-text"
                       aria-label="Close"
                     >
                       <X className="h-4 w-4" />
@@ -181,7 +181,7 @@ export function HomeEnquiryPopup() {
                 </div>
 
                 {submitted ? (
-                  <div className="space-y-4 px-5 py-8 text-center sm:px-6">
+                  <div className="space-y-4 overflow-y-auto px-5 py-8 text-center sm:px-6">
                     <p className="font-display text-2xl text-hm-text">Thank you</p>
                     <p className="text-sm text-hm-text-muted">
                       Your enquiry is in — our team will reach out shortly.
@@ -191,7 +191,10 @@ export function HomeEnquiryPopup() {
                     </Button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-3.5 px-5 py-5 sm:px-6">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-3.5 overflow-y-auto px-5 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6"
+                  >
                     <Field label="Your name" error={errors.contact}>
                       <Input
                         name="contact"

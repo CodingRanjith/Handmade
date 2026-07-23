@@ -262,19 +262,19 @@ export function ProductDetailsPage() {
   }
 
   return (
-    <div className="pb-10 pt-3">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+    <div className="pb-24 pt-3 lg:pb-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="mb-3 inline-flex items-center gap-2 text-sm text-hm-text-muted hover:text-hm-text"
+          className="mb-3 inline-flex min-h-11 items-center gap-2 text-sm text-hm-text-muted hover:text-hm-text"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </button>
 
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
-          <div className="lg:sticky lg:top-28">
+          <div className="lg:sticky lg:top-[var(--hm-header-offset)]">
             <div
               ref={imageFrameRef}
               role="button"
@@ -349,7 +349,7 @@ export function ProductDetailsPage() {
             ) : null}
           </div>
 
-          <div className="flex min-h-0 flex-col lg:max-h-[min(68svh,620px)] lg:overflow-y-auto lg:pr-1">
+          <div className="flex min-h-0 flex-col lg:pr-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-hm-accent">
               {product.category}
             </p>
@@ -511,16 +511,18 @@ export function ProductDetailsPage() {
               <div className="mt-1.5 inline-flex items-center rounded-xl border border-hm-border">
                 <button
                   type="button"
-                  className="px-3 py-2"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  aria-label="Decrease quantity"
                 >
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="min-w-10 text-center text-sm font-semibold">{qty}</span>
                 <button
                   type="button"
-                  className="px-3 py-2"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center"
                   onClick={() => setQty((q) => Math.min(product.stock || 99, q + 1))}
+                  aria-label="Increase quantity"
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -570,7 +572,7 @@ export function ProductDetailsPage() {
               </div>
             )}
 
-            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            <div className="mt-4 hidden gap-2.5 sm:grid sm:grid-cols-2">
               <Button variant="outline" size="lg" onClick={() => handleAddToBag('add')}>
                 <ShoppingBag className="h-4 w-4" />
                 Add to bag
@@ -668,6 +670,19 @@ export function ProductDetailsPage() {
         }}
         onContinue={handleCustomizeContinue}
       />
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-hm-border bg-hm-elevated/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-lg sm:hidden">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2">
+          <Button variant="outline" size="lg" onClick={() => handleAddToBag('add')}>
+            <ShoppingBag className="h-4 w-4" />
+            Add
+          </Button>
+          <Button variant="primary" size="lg" onClick={() => handleAddToBag('buy')}>
+            <Zap className="h-4 w-4" />
+            Buy now
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
